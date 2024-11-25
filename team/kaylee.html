@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaylee Serrano</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <header>
+        <h1>Kaylee Serrano</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Get to Know Kaylee</h2>
+            <p>Kaylee is passionate about software development and UI/UX design.</p>
+        </section>
+        <section>
+            <h2>Work Experience</h2>
+            <p>Software Engineer Intern at XYZ Corp.</p>
+        </section>
+        <section>
+            <h2>Past Projects</h2>
+            <p>Developed a PostScript interpreter and a temperature monitoring system.</p>
+        </section>
+        <section>
+            <h2>Contact Kaylee</h2>
+            <form onsubmit="handleContactForm(event)">
+                <label for="message">Message:</label>
+                <textarea id="message" required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </section>
+    </main>
+    <script>
+        function handleContactForm(event) {
+            event.preventDefault();
+            const message = document.getElementById("message").value;
+            sendContactMessage(message);
+        }
+    </script>
+</body>
+</html>

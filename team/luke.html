@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luke Stanek</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <header>
+        <h1>Luke Stanek</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Get to Know Luke</h2>
+            <p>Luke is a driven individual with expertise in embedded systems and hardware design.</p>
+        </section>
+        <section>
+            <h2>Work Experience</h2>
+            <p>Hardware Engineer Intern at DEF Corp.</p>
+        </section>
+        <section>
+            <h2>Past Projects</h2>
+            <p>Designed and implemented a receiver for detecting low-frequency light signals.</p>
+        </section>
+        <section>
+            <h2>Contact Luke</h2>
+            <form onsubmit="handleContactForm(event)">
+                <label for="message">Message:</label>
+                <textarea id="message" required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </section>
+    </main>
+    <script>
+        function handleContactForm(event) {
+            event.preventDefault();
+            const message = document.getElementById("message").value;
+            sendContactMessage(message);
+        }
+    </script>
+</body>
+</html>
