@@ -54,16 +54,19 @@ a {
 }
 
 body {
-    background-color: #444444;
+    background-color: #2d2d2d;
     color: white;
 }
 
 /* Navigation styles */
 .nav-container {
+    position: fixed; /* Fix the navigation at the top */
+    top: 0;
+    right: 0;
     padding: 20px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: flex-end; /* Align items to the right */
+    width: auto; /* Adjust width to content */
 }
 
 .home-link {
@@ -74,12 +77,14 @@ body {
 }
 
 .home-link:hover {
+    color: #FFCD00;
     transform: scale(1.1);
 }
 
 .nav-buttons {
     display: flex;
     gap: 2em;
+    margin-right: 20px; /* Add some right margin */
 }
 
 /* Dropdown styles */
@@ -98,6 +103,7 @@ body {
 }
 
 .dropdown-btn:hover {
+    color: #FFCD00;
     transform: scale(1.1);
 }
 
@@ -130,35 +136,38 @@ body {
 /* Main content styles */
 .main-content {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start; /* Change from center to flex-start */
+    align-items: flex-end; /* Change from center to flex-end */
     height: calc(100vh - 100px);
+    padding-left: 40px; /* Add padding for the AERIS title */
+    padding-bottom: 40px; /* Add bottom padding */
 }
-
 .main-title {
     font-size: 6em;
     letter-spacing: 0.1em;
+    margin-bottom: 0; 
 }
 
 /* Grid decoration */
 .grid {
     position: absolute;
     top: 0;
-    left: 0;
-    width: 200px;
-    height: 200px;
+    left: 0; 
+    width: 300px;
+    height: 200px; 
     background-image: linear-gradient(#ffffff 1px, transparent 1px),
                     linear-gradient(90deg, #ffffff 1px, transparent 1px);
     background-size: 20px 20px;
     opacity: 0.3;
+    rotate: 180deg;
 }
 
 .grid-bottom {
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 200px;
-    height: 200px;
+    width: 300px;
+    height: 350px;
     background-image: linear-gradient(#ffffff 1px, transparent 1px),
                     linear-gradient(90deg, #ffffff 1px, transparent 1px);
     background-size: 20px 20px;
@@ -176,6 +185,7 @@ body {
 }
 
 .profile-description {
+    width: 500px;
     margin-bottom: 40px;
 }
 
