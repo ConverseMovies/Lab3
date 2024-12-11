@@ -67,6 +67,8 @@ body {
     display: flex;
     justify-content: flex-end; /* Align items to the right */
     width: auto; /* Adjust width to content */
+    transition: opacity 0.3s ease;
+    z-index: 1000;
 }
 
 .home-link {
@@ -104,6 +106,8 @@ body {
     cursor: pointer;
     font-size: 1em;
     transition: transform 0.3s ease;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
 .dropdown-btn:hover {
@@ -143,14 +147,51 @@ body {
     display: flex;
     justify-content: flex-start; 
     align-items: flex-end; 
-    height: calc(100vh - 100px);
+    min-height: calc(100vh - 100px);
     padding-left: 40px; 
     padding-bottom: 40px; 
+    position: relative;
 }
+
 .main-title {
     font-size: 10em;
     letter-spacing: 0.1em;
-    margin-bottom: 0; 
+    margin-bottom: 0;
+    position: fixed; 
+    bottom: 40px; 
+    left: 40px; /* Match the padding-left from main-content */
+    transition: transform 0.3s ease-out, opacity 0.3s ease;
+}
+
+.main-lower {
+    position: relative;
+    margin-top: 150vh;
+    text-align: center;
+    padding: 40px;
+    padding-bottom: 0;
+    width: 100%;
+}
+
+.main-text {
+    font-size:2em;
+    margin-bottom: 20px;
+}
+
+.home-link-home {
+    position: fixed;
+    color: white;
+    text-decoration: none;
+    top: 20px;
+    left: 20px;
+    padding: 20px;
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.home-link-home:hover {
+    color: #FFCD00;
+    transform: scale(1.1);
 }
 
 /* Grid decoration */
@@ -168,7 +209,7 @@ body {
 }
 
 .grid-bottom {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: 0;
     width: 300px;
@@ -177,6 +218,7 @@ body {
                     linear-gradient(90deg, #ffffff 1px, transparent 1px);
     background-size: 20px 20px;
     opacity: 0.3;
+    z-index: -1;
 }
 
 /* Profile page styles */
@@ -264,7 +306,7 @@ textarea:focus{
 
 /* Bottom of page stuff */
 .bottom-text-container {
-    width: auto;
+    width: 100%;
     position: relative;
     justify-content: center;
     text-align: center;

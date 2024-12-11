@@ -36,7 +36,18 @@
 
     <div class="main-content">
         <h1 class="main-title">AERIS</h1>
+        <div class="main-lower">
+            <h2 class="main-text">who we are</h2>
+            <div class="profile-image">
+                <img src = "/static/elizabethh.jpg" alt="ePFP" style="width: 300; position: relative; left: 30px;">
+            </div>
+            <div class="bottom-text-container">
+                <a href="/" class="bottom-text">aeris</a>
+                <a href="#" class="bottom-text" id="lab1-link">logs</a>
+            </div>
+        </div>
     </div>
+
 
     
 
@@ -64,6 +75,40 @@
                 })
                 .catch(error => console.error('Error:', error));
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainTitle = document.querySelector('.main-title');
+            const homeLink = document.createElement('a');
+            
+            // Create and add the home link
+            homeLink.className = 'home-link';
+            homeLink.href = '/';
+            homeLink.textContent = 'aeris';
+            homeLink.style.display = 'none';
+            document.body.appendChild(homeLink);
+            
+            // Get the original position of the title
+            const titleRect = mainTitle.getBoundingClientRect();
+            const originalTop = titleRect.top + window.scrollY;
+            
+            // Handle scroll events
+            window.addEventListener('scroll', () => {
+                const scrollPosition = window.scrollY;
+                const triggerPoint = originalTop - 100;
+                
+                if (scrollPosition < triggerPoint) {
+                    mainTitle.style.transform = `translateY(${-scrollPosition}px)`;
+                    mainTitle.style.display = 'block';
+                    mainTitle.style.opacity = '1';
+                    homeLink.style.display = 'none';
+                } else {
+                    mainTitle.style.display = 'none';
+                    homeLink.style.display = 'block';
+                }
+            });
         });
     </script>
 </body>
