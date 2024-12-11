@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Portfolio</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Our Team Portfolio</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/team/kaylee.html">Kaylee Serrano</a></li>
+            <li><a href="/team/luke.html">Luke Stanek</a></li>
+            <li><a href="/team/elizabeth.html">Elizabeth Stone</a></li>
+            <li><a href="/team/gavin.html">Gavin Egger</a></li>
+        </ul>
+    </nav>
+    <main>
+        <p>Explore our team members and their projects!</p>
+        <a href="#" id="protected-link">Access Protected Page</a>
+        <p id="error-message" style="color: red; display: none;"></p> <!-- Error message -->
+    </main>
+
+    <script>
+        document.getElementById('protected-link').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            const password = prompt("Enter the password to access the protected page:");
+            if (password) {
+                fetch('/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password: password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Redirect to the protected page
+                        window.location.href = data.redirect_url;
+                    } else {
+                        // Show error message
+                        const errorMessage = document.getElementById('error-message');
+                        errorMessage.textContent = data.message;
+                        errorMessage.style.display = 'block';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    </script>
+</body>
+</html>
