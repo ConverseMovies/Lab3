@@ -12,24 +12,23 @@
     </header>
     <nav>
         <ul>
-            <li><a href="/team/kaylee.html">Kaylee Serrano</a></li>
-            <li><a href="/team/luke.html">Luke Stanek</a></li>
-            <li><a href="/team/elizabeth.html">Elizabeth Stone</a></li>
-            <li><a href="/team/gavin.html">Gavin Egger</a></li>
+            <li><a href="/static/kaylee.html">Kaylee Serrano</a></li>
+            <li><a href="/static/luke.html">Luke Stanek</a></li>
+            <li><a href="/static/elizabeth.html">Elizabeth Stone</a></li>
+            <li><a href="/static/gavin.html">Gavin Egger</a></li>
         </ul>
     </nav>
     <main>
-        <p>Explore our team members and their projects!</p>
-        <a href="#" id="protected-link">Access Protected Page</a>
-        <p id="error-message" style="color: red; display: none;"></p> <!-- Error message -->
+        <a href="#" id="lab1-link">View Lab 1 Summary</a>
+        <p id="error-message-lab1" style="color: red; display: none;"></p>
     </main>
 
     <script>
-        document.getElementById('protected-link').addEventListener('click', function (e) {
+        document.getElementById('lab1-link').addEventListener('click', function (e) {
             e.preventDefault(); // Prevent default link behavior
-            const password = prompt("Enter the password to access the protected page:");
+            const password = prompt("Enter the password to access the Lab 1 summary:");
             if (password) {
-                fetch('/validate', {
+                fetch('/lab1', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -39,11 +38,9 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Redirect to the protected page
                         window.location.href = data.redirect_url;
                     } else {
-                        // Show error message
-                        const errorMessage = document.getElementById('error-message');
+                        const errorMessage = document.getElementById('error-message-lab1');
                         errorMessage.textContent = data.message;
                         errorMessage.style.display = 'block';
                     }
