@@ -3,16 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elizabeth Stone</title>
+    <title>elizabeth</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <header>
-        <h1>Elizabeth Stone</h1>
-    </header>
-    <main>
-        <h2>About Elizabeth</h2>
-        <p>Details about Elizabeth's contributions and projects.</p>
-    </main>
+    <div class="grid-bottom"></div>
+    
+    <nav class="nav-container">
+        <a href= "/" class="home-link">aeris</a>
+        <div class="nav-buttons">
+            <div class="dropdown">
+                <button class="dropdown-btn">who we are</button>
+                <div class="dropdown-content">
+                    <a href="/static/elizabeth.html">elizabeth</a>
+                    <a href="/static/gavin.html">gavin</a>
+                    <a href="/static/kaylee.html">kaylee</a>
+                    <a href="/static/luke.html">luke</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropdown-btn">our projects</button>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('lab1_summary') }}">lab one</a>
+                    <a href="{{ url_for('project', lab='lab-two') }}">lab two</a>
+                    <a href="{{ url_for('project', lab='lab-three') }}">lab three</a>
+                    <a href="{{ url_for('project', lab='lab-four') }}">lab four</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <h2 class="profile-title">elizabeth</h2>
+            <p class="profile-description">elizabeth is so cool and awesome. really the best person ever. why doesnt everyone become as sexy and cool as her.</p>
+        <div class="profile-image-placeholder">
+            NOTE:<br>
+            PHOTO TO BE ADDED HERE
+        </div>
+    </div>
 </body>
 </html>
