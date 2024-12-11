@@ -4,40 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gavin Egger</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <header>
         <h1>Gavin Egger</h1>
     </header>
     <main>
-        <section>
-            <h2>Get to Know Gavin</h2>
-            <p>Gavin specializes in software engineering and data analysis, with a strong focus on innovative solutions.</p>
-        </section>
-        <section>
-            <h2>Work Experience</h2>
-            <p>Data Analyst Intern at JKL Corp.</p>
-        </section>
-        <section>
-            <h2>Past Projects</h2>
-            <p>Developed data visualization tools to analyze and present team performance metrics.</p>
-        </section>
-        <section>
-            <h2>Contact Gavin</h2>
-            <form onsubmit="handleContactForm(event)">
-                <label for="message">Message:</label>
-                <textarea id="message" required></textarea>
-                <button type="submit">Send</button>
-            </form>
-        </section>
+        <h2>About Gavin</h2>
+        <p>Details about Gavin's contributions and projects.</p>
     </main>
-    <script>
-        function handleContactForm(event) {
-            event.preventDefault();
-            const message = document.getElementById("message").value;
-            sendContactMessage(message);
-        }
-    </script>
 </body>
 </html>
