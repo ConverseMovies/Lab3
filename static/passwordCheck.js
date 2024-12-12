@@ -31,4 +31,5 @@ document.addEventListener('DOMContentLoaded', function () {
     // Setup links
     setupPasswordProtectedLink('lab1-link');
     setupPasswordProtectedLink('lab1-link-lower'); // For additional Lab 1 links
+    setupPasswordProtectedLink('lab1-link-gavin');
 });
