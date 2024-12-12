@@ -37,10 +37,47 @@
     <div class="main-content">
         <h1 class="main-title">AERIS</h1>
         <div class="main-lower">
-            <h2 class="main-text">who we are</h2>
-            <div class="profile-image">
-                <img src = "/static/elizabethh.jpg" alt="ePFP" style="width: 300; position: relative; left: 30px;">
+            <h2 class="main-text">meet the team</h2>
+
+            <div class="image-grid">
+                <div class="image-card">
+                    <img class="card-image" src="/static/elizabethh.jpg">
+                    <a href="/static/elizabeth.html" class="card-text">elizabeth stone</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/elizabethh.jpg">
+                    <a href="/static/gavin.html" class="card-text">gavin egger</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/elizabethh.jpg">
+                    <a href="/static/kaylee.html" class="card-text">kaylee serrano</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/elizabethh.jpg">
+                    <a href="/static/luke.html" class="card-text">luke stanek</a>
+                </div>
             </div>
+
+            <h2 class="main-text">the calendar</h2>
+            <a href="/static/calendar.html" class="card-text" style="padding-bottom: 40px;">click here to learn more about our capstone project</a>
+            
+            <h2 class="main-text" style="padding-top: 60px;">our other projects</h2>
+
+            <div class="image-grid-2">
+                <div class="image-card">
+                    <img class="card-image" src="/static/ports.jpg">
+                    <a href="#" id="lab1-link-lower" class="card-text">lab one</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/ports.jpg">
+                    <a href="#" class="card-text" id="lab1-link">lab two</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/ports.jpg">
+                    <a href="#" class="card-text" id="lab1-link">lab three</a>
+                </div>
+            </div>
+
             <div class="bottom-text-container">
                 <a href="/" class="bottom-text">aeris</a>
                 <a href="#" class="bottom-text" id="lab1-link">logs</a>
@@ -77,6 +114,32 @@
             }
         });
     </script>
+        <script>
+            document.getElementById('lab1-link-lower').addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent default link behavior
+                const password = prompt("Enter the password to access the Lab 1 summary:");
+                if (password) {
+                    fetch('/lab1', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ password: password })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            const errorMessage = document.getElementById('error-message-lab1');
+                            errorMessage.textContent = data.message;
+                            errorMessage.style.display = 'block';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+        </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
