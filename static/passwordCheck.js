@@ -34,4 +34,5 @@ document.addEventListener('DOMContentLoaded', function () {
     setupPasswordProtectedLink('lab1-link-gavin');
     setupPasswordProtectedLink('lab1-link-elizabeth');
     setupPasswordProtectedLink('lab1-link-luke');
+    setupPasswordProtectedLink('lab1-link-kaylee');
 });
