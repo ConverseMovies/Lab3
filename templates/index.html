@@ -3,25 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Portfolio</title>
+    <title>AERIS</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <header>
-        <h1>Welcome to Our Team Portfolio</h1>
-    </header>
-    <nav>
-        <ul>
-            <li><a href="/team/kaylee.html">Kaylee Serrano</a></li>
-            <li><a href="/team/luke.html">Luke Stanek</a></li>
-            <li><a href="/static/elizabeth.html">Elizabeth Stone</a></li>
-            <li><a href="/static/gavin.html">Gavin Egger</a></li>
-        </ul>
+    <div class="grid"></div>
+    <div class="grid-bottom"></div>
+
+    
+    <nav class="nav-container">
+        <div class="nav-buttons">
+            <div class="dropdown">
+                <button class="dropdown-btn">who we are</button>
+                <div class="dropdown-content">
+                    <a href="/static/elizabeth.html">elizabeth</a>
+                    <a href="/static/gavin.html">gavin</a>
+                    <a href="/static/kaylee.html">kaylee</a>
+                    <a href="/static/luke.html">luke</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropdown-btn">our projects</button>
+                <div class="dropdown-content">
+                    <a href="#" id="lab1-link">lab one</a>
+                    <a href="#">lab two</a>
+                    <a href="#">lab three</a>
+                    <a href="#">lab four</a>
+                </div>
+            </div>
+        </div>
     </nav>
-    <main>
-        <a href="#" id="lab1-link">View Lab 1 Summary</a>
-        <p id="error-message-lab1" style="color: red; display: none;"></p>
-    </main>
+
+    <div class="main-content">
+        <h1 class="main-title">AERIS</h1>
+        <div class="main-lower">
+            <h2 class="main-text">meet the team</h2>
+
+            <div class="image-grid">
+                <div class="image-card">
+                    <img class="card-image" src="/static/elizabethh.jpg">
+                    <a href="/static/elizabeth.html" class="card-text">elizabeth stone</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/elizabethh.jpg">
+                    <a href="/static/gavin.html" class="card-text">gavin egger</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/elizabethh.jpg">
+                    <a href="/static/kaylee.html" class="card-text">kaylee serrano</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/elizabethh.jpg">
+                    <a href="/static/luke.html" class="card-text">luke stanek</a>
+                </div>
+            </div>
+
+            <h2 class="main-text">the calendar</h2>
+            <a href="/static/calendar.html" class="card-text">click here to learn more about our capstone project</a>
+            
+            <h2 class="main-text" style="padding-top: 60px;">our other projects</h2>
+
+            <div class="image-grid-2">
+                <div class="image-card">
+                    <img class="card-image" src="/static/ports.jpg">
+                    <a href="#" id="lab1-link-lower" class="card-text">lab one</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/ports.jpg">
+                    <a href="#" class="card-text" id="lab1-link">lab two</a>
+                </div>
+                <div class="image-card">
+                    <img class="card-image" src="/static/ports.jpg">
+                    <a href="#" class="card-text" id="lab1-link">lab three</a>
+                </div>
+            </div>
+
+            <div class="bottom-text-container">
+                <a href="/" class="bottom-text">aeris</a>
+                <a href="#" class="bottom-text" id="lab1-link">logs</a>
+            </div>
+        </div>
+    </div>
+
+
+    
 
     <script>
         document.getElementById('lab1-link').addEventListener('click', function (e) {
@@ -47,6 +112,66 @@
                 })
                 .catch(error => console.error('Error:', error));
             }
+        });
+    </script>
+        <script>
+            document.getElementById('lab1-link-lower').addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent default link behavior
+                const password = prompt("Enter the password to access the Lab 1 summary:");
+                if (password) {
+                    fetch('/lab1', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ password: password })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = data.redirect_url;
+                        } else {
+                            const errorMessage = document.getElementById('error-message-lab1');
+                            errorMessage.textContent = data.message;
+                            errorMessage.style.display = 'block';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+        </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainTitle = document.querySelector('.main-title');
+            const homeLink = document.createElement('a');
+            
+            // Create and add the home link
+            homeLink.className = 'home-link';
+            homeLink.href = '/';
+            homeLink.textContent = 'aeris';
+            homeLink.style.display = 'none';
+            document.body.appendChild(homeLink);
+            
+            // Get the original position of the title
+            const titleRect = mainTitle.getBoundingClientRect();
+            const originalTop = titleRect.top + window.scrollY;
+            
+            // Handle scroll events
+            window.addEventListener('scroll', () => {
+                const scrollPosition = window.scrollY;
+                const triggerPoint = originalTop - 100;
+                
+                if (scrollPosition < triggerPoint) {
+                    mainTitle.style.transform = `translateY(${-scrollPosition}px)`;
+                    mainTitle.style.display = 'block';
+                    mainTitle.style.opacity = '1';
+                    homeLink.style.display = 'none';
+                } else {
+                    mainTitle.style.display = 'none';
+                    homeLink.style.display = 'block';
+                }
+            });
         });
     </script>
 </body>

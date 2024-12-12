@@ -41,3 +41,356 @@ a {
     color: #FFD700;
     text-decoration: underline;
 }
+
+
+/* NEW STYLE STUFF HEREEEEE */
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: monospace;
+}
+
+body {
+    background-color: #1e1e1e;
+    color: white;
+}
+
+/* Navigation styles */
+.nav-container {
+    position: fixed; /* Fix the navigation at the top */
+    top: 0;
+    right: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: flex-end; /* Align items to the right */
+    width: auto; /* Adjust width to content */
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+.home-link {
+    position: fixed;
+    color: white;
+    text-decoration: none;
+    top: 0;
+    left: 0;
+    padding: 20px;
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+.home-link:hover {
+    color: #FFCD00;
+    transform: scale(1.1);
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 2em;
+    margin-right: 20px; /* Add some right margin */
+}
+
+/* Dropdown styles */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+    transition: transform 0.3s ease;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.dropdown-btn:hover {
+    color: #FFCD00;
+    transform: scale(1.1);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #333333;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-content a:hover {
+    background-color: #FFCD00;
+    color:#1e1e1e
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Main content styles */
+.main-content {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: flex-end; 
+    min-height: calc(100vh - 100px);
+    padding-left: 40px; 
+    padding-bottom: 20px; 
+    position: relative;
+}
+
+.main-title {
+    font-size: 10em;
+    letter-spacing: 0.1em;
+    margin-bottom: 0;
+    position: fixed; 
+    bottom: 40px; 
+    left: 40px; /* Match the padding-left from main-content */
+    transition: transform 0.3s ease-out, opacity 0.3s ease;
+}
+
+.main-lower {
+    position: relative;
+    margin-top: 150vh;
+    text-align: center;
+    padding: 20px;
+    padding-bottom: 0;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.main-text {
+    font-size:2em;
+    margin-bottom: 20px;
+}
+
+.home-link-home {
+    position: fixed;
+    color: white;
+    text-decoration: none;
+    top: 20px;
+    left: 20px;
+    padding: 20px;
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+
+.home-link-home:hover {
+    color: #FFCD00;
+    transform: scale(1.1);
+}
+
+/* Images for Main Page */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 80px;
+}
+
+.image-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 80px;
+}
+
+.image-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-image{
+    width: 100%;
+    padding: 10px;
+}
+
+.card-image img{
+    width: auto;
+    height: 250px;
+    margin-bottom: 15px;
+}
+
+.card-text {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.3em;
+    color: #ffffff;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.card-text:hover {
+    color: #FFCD00;
+    transform: scale(1.1);
+}
+
+/* Grid decoration */
+.grid {
+    position: absolute;
+    top: 0;
+    left: 0; 
+    width: 300px;
+    height: 200px; 
+    background-image: linear-gradient(#FFCD00 1px, transparent 1px),
+                    linear-gradient(90deg, #FFCD00 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.5;
+    rotate: 180deg;
+}
+
+.grid-bottom {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    height: 350px;
+    background-image: linear-gradient(#FFCD00 1px, transparent 1px),
+                    linear-gradient(90deg, #FFCD00 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.5;
+    z-index: -1;
+}
+
+/* Profile page styles */
+.profile-container {
+    position: fixed;
+    top: 85px;
+    left: 0;
+    padding: 20px;
+    height: calc(100vh - 85px);
+    overflow-y:auto;
+    width: 100%;
+}
+
+.more-content-section{
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.content-section {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.profile-title {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.profile-description {
+    width: 1000px;
+    margin-bottom: 40px;
+}
+
+.profile-image {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.profile-image img {
+    height: auto;
+    max-width: 400px;
+}
+
+textarea {
+    width: 50%;
+    height: 200px;
+    resize:none;
+    border: 4px solid #FFCD00;
+    border-radius: 10px;
+    background-color: #e1e1e1;
+    margin-bottom: 20px;
+    padding: 8px;
+}
+
+textarea:focus{
+    outline: none;
+    resize: vertical;
+    background-color: #ffffff;
+}
+
+.send-msg-btn {
+    width: 110px;
+    height: 50px;
+    padding: 2px;
+    position: relative;
+    left: 500px;
+    border: 1px solid #1e1e1e;
+    background-color: #FFCD00;
+    color:#1e1e1e;
+    text-align: center;
+    border-radius: 10px;
+    font-size: 1.5em;
+    margin-bottom: 40px;
+    font-weight: bold;
+}
+
+.send-msg-btn:hover{
+    background-color: #be9902;
+}
+
+.send-msg-btn:active {
+    transform: translateY(4px);
+}
+
+/* Lab Page stuff */
+
+
+
+
+/* Bottom of page stuff */
+.bottom-text-container {
+    width: 100%;
+    position: relative;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.bottom-text {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+    color: #ffffff;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.bottom-text:hover {
+    color: #FFCD00;
+    transform: scale(1.1);
+}
+
