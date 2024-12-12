@@ -97,9 +97,13 @@ function getTargetUrl(linkId) {
     const urlMap = {
         'logs-link': '/logs_list',
         'lab1-link': '/lab1_summary',
+        'lab1-link-lower': '/lab1_summary',
         'lab2-link': '/lab2_summary',
+        'lab2-link-lower': '/lab2_summary',
         'lab3-link': '/lab3_summary',
+        'lab3-link-lower': '/lab3_summary',
         'aetas-link': '/aetas_summary',
+        'aetas-link-lower': '/aetas_summary'
     };
     return urlMap[linkId] || '/';
 }

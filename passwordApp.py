@@ -3,25 +3,23 @@ from functools import wraps
 import os
 import secrets
 from datetime import timedelta
+import time
 
 app = Flask(__name__)
-# Generate a secure random secret key for sessions
 app.secret_key = secrets.token_hex(32)
+app.config['SESSION_PERMANENT'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 
-# Production-ready session configuration
-app.config.update(
-    SESSION_COOKIE_SECURE=True,  # For HTTPS
-    SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript access to session cookie
-    SESSION_COOKIE_SAMESITE='Lax',  # Prevent CSRF
-    SESSION_PERMANENT=False,  # Session expires when browser closes
-    PERMANENT_SESSION_LIFETIME=timedelta(days=1),  # Backup timeout
-    SESSION_COOKIE_NAME='AerisSession'  # Custom cookie name
-)
+# Store tab-specific sessions
+tab_sessions = {}
 
-# Check if running in development environment
-if app.debug or 'DEVELOPMENT' in os.environ:
-    # Override secure cookie setting for local development
-    app.config['SESSION_COOKIE_SECURE'] = False
+def cleanup_old_sessions():
+    """Clean up expired tab sessions"""
+    current_time = time.time()
+    expired_tabs = [tab for tab, data in tab_sessions.items() 
+                   if current_time - data['timestamp'] > 3600]
+    for tab in expired_tabs:
+        del tab_sessions[tab]
 
 def read_password(file_path="password.txt"):
     """Reads the password from the password.txt file."""
@@ -31,22 +29,23 @@ def read_password(file_path="password.txt"):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'authenticated' not in session:
-            # Return JSON response for AJAX requests
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({"success": False, "redirect_url": url_for('login')}), 401
-            return redirect(url_for('login', next=request.url))
-        return f(*args, **kwargs)
+        cleanup_old_sessions()
+        
+        if 'authenticated' in session:
+            return f(*args, **kwargs)
+        
+        # For AJAX requests
+        if request.is_json:
+            return jsonify({"success": False, "redirect_url": url_for('login')}), 401
+            
+        # For regular requests
+        return redirect(url_for('login', next=request.url))
+    
     return decorated_function
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/check-auth', methods=['POST'])
-def check_auth():
-    """Endpoint to check if user is authenticated"""
-    return jsonify({"authenticated": 'authenticated' in session})
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -55,7 +54,6 @@ def login():
         actual_password = read_password()
         
         if user_password == actual_password:
-            session.permanent = False  # Make session expire on browser close
             session['authenticated'] = True
             next_page = request.args.get('next') or request.json.get('next')
             return jsonify({
@@ -72,7 +70,7 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-# Protected routes
+# Protected routes - combine GET and POST methods
 @app.route('/lab1', methods=['GET', 'POST'])
 @login_required
 def lab1():
