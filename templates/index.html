@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AERIS</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/passwordCheck.js"></script>
 </head>
 <body>
     <div class="grid"></div>
@@ -46,7 +47,7 @@
                 </div>
                 <div class="image-card">
                     <img class="card-image" src="/static/gavinEgger1.jpg">
-                    <a href="/static/gavin.html" class="card-text">gavin egger</a>
+                    <a href="/team/gavin.html" class="card-text">gavin egger</a>
                 </div>
                 <div class="image-card">
                     <img class="card-image" src="/static/elizabethh.jpg">
@@ -84,95 +85,5 @@
             </div>
         </div>
     </div>
-
-
-    
-
-    <script>
-        document.getElementById('lab1-link').addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent default link behavior
-            const password = prompt("Enter the password to access the Lab 1 summary:");
-            if (password) {
-                fetch('/lab1', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ password: password })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = data.redirect_url;
-                    } else {
-                        const errorMessage = document.getElementById('error-message-lab1');
-                        errorMessage.textContent = data.message;
-                        errorMessage.style.display = 'block';
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        });
-    </script>
-        <script>
-            document.getElementById('lab1-link-lower').addEventListener('click', function (e) {
-                e.preventDefault(); // Prevent default link behavior
-                const password = prompt("Enter the password to access the Lab 1 summary:");
-                if (password) {
-                    fetch('/lab1', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ password: password })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.href = data.redirect_url;
-                        } else {
-                            const errorMessage = document.getElementById('error-message-lab1');
-                            errorMessage.textContent = data.message;
-                            errorMessage.style.display = 'block';
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-                }
-            });
-        </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const mainTitle = document.querySelector('.main-title');
-            const homeLink = document.createElement('a');
-            
-            // Create and add the home link
-            homeLink.className = 'home-link';
-            homeLink.href = '/';
-            homeLink.textContent = 'aeris';
-            homeLink.style.display = 'none';
-            document.body.appendChild(homeLink);
-            
-            // Get the original position of the title
-            const titleRect = mainTitle.getBoundingClientRect();
-            const originalTop = titleRect.top + window.scrollY;
-            
-            // Handle scroll events
-            window.addEventListener('scroll', () => {
-                const scrollPosition = window.scrollY;
-                const triggerPoint = originalTop - 100;
-                
-                if (scrollPosition < triggerPoint) {
-                    mainTitle.style.transform = `translateY(${-scrollPosition}px)`;
-                    mainTitle.style.display = 'block';
-                    mainTitle.style.opacity = '1';
-                    homeLink.style.display = 'none';
-                } else {
-                    mainTitle.style.display = 'none';
-                    homeLink.style.display = 'block';
-                }
-            });
-        });
-    </script>
 </body>
 </html>
