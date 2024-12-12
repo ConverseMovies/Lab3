@@ -1,64 +1,109 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Function to handle password-protected links
-    function setupPasswordProtectedLink(linkId) {
-        const link = document.getElementById(linkId);
-        if (link) {
-            link.addEventListener('click', function (e) {
-                e.preventDefault(); // Prevent default behavior
-                const password = prompt("Enter the password to access this page:");
-                if (password) {
-                    if(linkId=='logs-link'){
-                        thingToFetch='/logs';
-
-                    }
-                    else if(linkId=='lab1-link' || linkId=='lab1-link-lower'){
-                        thingToFetch='/lab1';
-                    }
-                    else if(linkId=='lab2-link' || linkId=='lab2-link-lower'){
-                        thingToFetch='/lab2';
-                    }
-                    else if(linkId=='lab3-link' || linkId=='lab3-link-lower'){
-                        thingToFetch='/lab3';
-                    }
-                    else{
-                        thingToFetch='/aetas';
-                    }
-                    fetch(thingToFetch, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ password: password })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            window.location.href = data.redirect_url; // Redirect on success
-                        } else {
-                            alert("Incorrect password. Please try again.");
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+    // Check if this is a new tab session
+    if (!sessionStorage.getItem('tabAuthenticated')) {
+        // Force a new authentication check
+        fetch('/check-auth', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.authenticated) {
+                sessionStorage.setItem('tabAuthenticated', 'true');
+            } else {
+                // Clear any existing authentication
+                sessionStorage.removeItem('tabAuthenticated');
+                // If on a protected page, redirect to login
+                if (isProtectedPage()) {
+                    window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
                 }
-            });
-        }
+            }
+        });
     }
 
-
-    //LOGS LINK
-    setupPasswordProtectedLink('logs-link');
-    // Setup links
-    setupPasswordProtectedLink('lab1-link');
-    setupPasswordProtectedLink('lab1-link-lower'); // For additional Lab 1 links
-
-    setupPasswordProtectedLink('lab2-link');
-    setupPasswordProtectedLink('lab2-link-lower');
-
-    setupPasswordProtectedLink('lab3-link');
-    setupPasswordProtectedLink('lab3-link-lower');
-
-    setupPasswordProtectedLink('aetas-link');
-    setupPasswordProtectedLink('aetas-link-lower');
-
-
+    // Handle clicks on protected links
+    document.querySelectorAll('[id$="-link"]').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            handleProtectedLink(this.id);
+        });
+    });
 });
+
+function isProtectedPage() {
+    // List of protected paths
+    const protectedPaths = [
+        '/lab1_summary',
+        '/lab2_summary',
+        '/lab3_summary',
+        '/aetas_summary',
+        '/logs_list'
+    ];
+    return protectedPaths.some(path => window.location.pathname.startsWith(path));
+}
+
+function handleProtectedLink(linkId) {
+    if (!sessionStorage.getItem('tabAuthenticated')) {
+        const targetUrl = getTargetUrl(linkId);
+        window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
+        return;
+    }
+
+    let thingToFetch;
+    if (linkId.includes('logs-link')) {
+        thingToFetch = '/logs';
+    } else if (linkId.includes('lab1-link')) {
+        thingToFetch = '/lab1';
+    } else if (linkId.includes('lab2-link')) {
+        thingToFetch = '/lab2';
+    } else if (linkId.includes('lab3-link')) {
+        thingToFetch = '/lab3';
+    } else if (linkId.includes('aetas-link')) {
+        thingToFetch = '/aetas';
+    }
+
+    if (thingToFetch) {
+        fetch(thingToFetch, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.status === 401) {
+                sessionStorage.removeItem('tabAuthenticated');
+                window.location.href = `/login?next=${encodeURIComponent(thingToFetch)}`;
+                return null;
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.success) {
+                window.location.href = data.redirect_url;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            sessionStorage.removeItem('tabAuthenticated');
+        });
+    }
+}
+
+function getTargetUrl(linkId) {
+    const urlMap = {
+        'logs-link': '/logs_list',
+        'lab1-link': '/lab1_summary',
+        'lab1-link-lower': '/lab1_summary',
+        'lab2-link': '/lab2_summary',
+        'lab2-link-lower': '/lab2_summary',
+        'lab3-link': '/lab3_summary',
+        'lab3-link-lower': '/lab3_summary',
+        'aetas-link': '/aetas_summary',
+        'aetas-link-lower': '/aetas_summary'
+    };
+    return urlMap[linkId] || '/';
+}

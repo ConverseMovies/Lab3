@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AERIS</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Protected Content</h1>
+        <p>Please enter the password to access this content.</p>
+        <div class="password-form">
+            <input type="password" id="password" placeholder="Enter password">
+            <button onclick="submitPassword()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+    // Clear any existing tab authentication when on login page
+    sessionStorage.removeItem('tabAuthenticated');
+
+    function submitPassword() {
+        const password = document.getElementById('password').value;
+        const nextUrl = new URLSearchParams(window.location.search).get('next') || '/';
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ 
+                password: password,
+                next: nextUrl
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                sessionStorage.setItem('tabAuthenticated', 'true');
+                window.location.href = data.redirect_url;
+            } else {
+                alert("Incorrect password. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred. Please try again.");
+        });
+    }
+
+    // Allow Enter key to submit
+    document.getElementById('password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            submitPassword();
+        }
+    });
+    </script>
+</body>
+</html>
