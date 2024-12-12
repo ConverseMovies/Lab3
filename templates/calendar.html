@@ -5,4 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>calendar</title>
     <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/passwordCheck.js"></script>
 </head>
+<body>
+    <div class="grid-bottom"></div>
+    
+    <div class="profile-container">
+        <h2 class="profile-title">aetas</h2>
+        <div class="content-section" style="padding-bottom: 0px;">
+            <p class="profile-description">The aetas project successfully integrated an ESP32 microcontroller with sensors, an LCD display, and a Java GUI
+                to monitor temperature data in real-time. Utilizing Firebase Realtime Database, the system enables cloud-based 
+                communication between hardware and software components.<br>
+                <br>
+                <br>
+                Key features include user-defined temperature thresholds, automated email notifications, and graphical data 
+                visualization. Initially implemented in C++, challenges with GUI and HTTP libraries prompted a switch to Java, 
+                leveraging Swing and JFreeChart for robust interface and graph functionality.</p>
+            <div class="profile-image" style="margin-top: 0;">
+                <img src="/static/ports.jpg" alt="lab1port" style="height:250; position: absolute; top: 0px; right: 50px; margin-bottom:40px;">
+            </div>
+        </div>
+        <div class="image-grid-2" style="padding-top:40px; height: 600px; margin-bottom:60px;">
+            <div class="profile-image" style="margin-top: 0; width: 440px;">
+                <img src="/static/finalCircuitLayoutWithESPandPwrAndLCD.jpg" alt="lab1port" style="width:400px; position: absolute; top: 0; left: 20px; padding-bottom: 40px;">
+            </div>
+            <div class="content-section" style="width: 400px;">
+                <h3><br><br><br>highlights:</h3>
+                <p class="profile-description"><br><br><br><br>- ESP32 microcontroller connected to sensors and LCD.<br>
+                                               - Java GUI with real-time graph plotting and email alerts.<br>
+                                               - Cloud communication via Firebase.</p>
+            </div>
+            <div class="profile-image" style="margin-top: 0;">
+                <img src="/static/openBoxImage.jpg" alt="lab1port" style="height: 250px; position: absolute; top: 130px; right:0px; padding-bottom: 40px;">
+            </div>
+
+            
+        </div>
+        <div class="bottom-text-container">
+            <a href="/" class="bottom-text">aeris</a>
+            <a href="#" class="bottom-text" id="logs-link">logs</a>
+        </div>
+    </div>
+
+
+    <nav class="nav-container">
+        <a href= "/" class="home-link">aeris</a>
+        <div class="nav-buttons">
+            <div class="dropdown">
+                <button class="dropdown-btn">who we are</button>
+                <div class="dropdown-content">
+                    <a href="/static/elizabeth.html">elizabeth</a>
+                    <a href="/static/gavin.html">gavin</a>
+                    <a href="/static/kaylee.html">kaylee</a>
+                    <a href="/static/luke.html">luke</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropdown-btn">our projects</button>
+                <div class="dropdown-content">
+                    <a href="#" id="aetas-link">aetas</a>
+                    <a href="#" id="lab1-link">lab one</a>
+                    <a href="#" id="lab2-link">lab two</a>
+                    <a href="#" id="lab3-link">lab three</a>
+                    
+                </div>
+            </div>
+        </div>
+    </nav>
+
+</body>
+</html>
