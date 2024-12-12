@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>elizabeth</title>
+    <title>gavin</title>
     <link rel="stylesheet" href="/static/styles.css">
     <script src="/static/passwordCheck.js"></script>
 </head>
@@ -59,34 +59,6 @@
         </div>
     </nav>
 
-    <script>
-        document.getElementById('lab1-link').addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent default link behavior
-            const password = prompt("Enter the password to access the Lab 1 summary:");
-            if (password) {
-                fetch('/lab1', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ password: password })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = data.redirect_url;
-                    } else {
-                        const errorMessage = document.getElementById('error-message-lab1');
-                        errorMessage.textContent = data.message;
-                        errorMessage.style.display = 'block';
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        });
-    </script>
-
-    
 
 </body>
 </html>
