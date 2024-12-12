@@ -3,33 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab 1 Summary</title>
+    <title>lab one summary</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <header>
-        <h1>Lab 1: ESP32 Integrated System</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Project Summary</h2>
-            <p>
-                The Lab 1 project successfully integrated an ESP32 microcontroller with sensors, an LCD display, and a Java GUI
+    <div class="grid-bottom"></div>
+    
+    <nav class="nav-container">
+        <a href= "/" class="home-link">aeris</a>
+        <div class="nav-buttons">
+            <div class="dropdown">
+                <button class="dropdown-btn">who we are</button>
+                <div class="dropdown-content">
+                    <a href="/static/elizabeth.html">elizabeth</a>
+                    <a href="/static/gavin.html">gavin</a>
+                    <a href="/static/kaylee.html">kaylee</a>
+                    <a href="/static/luke.html">luke</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropdown-btn">our projects</button>
+                <div class="dropdown-content">
+                    <a href="#" id="lab1-link">lab one</a>
+                    <a href="#">lab two</a>
+                    <a href="#">lab three</a>
+                    <a href="#">lab four</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <h2 class="profile-title">lab one</h2>
+            <p class="profile-description">The Lab 1 project successfully integrated an ESP32 microcontroller with sensors, an LCD display, and a Java GUI
                 to monitor temperature data in real-time. Utilizing Firebase Realtime Database, the system enables cloud-based 
-                communication between hardware and software components.
-            </p>
-            <p>
-                Key features include user-defined temperature thresholds, automated email notifications, and graphical data 
+                communication between hardware and software components. </p>
+            <p class="profile-description">Key features include user-defined temperature thresholds, automated email notifications, and graphical data 
                 visualization. Initially implemented in C++, challenges with GUI and HTTP libraries prompted a switch to Java, 
-                leveraging Swing and JFreeChart for robust interface and graph functionality.
-            </p>
-            <h3>Highlights:</h3>
-            <ul>
-                <li>ESP32 microcontroller connected to sensors and LCD.</li>
-                <li>Java GUI with real-time graph plotting and email alerts.</li>
-                <li>Cloud communication via Firebase.</li>
-            </ul>
-        </section>
-    </main>
+                leveraging Swing and JFreeChart for robust interface and graph functionality.</p>
+    </div>
+
+    <script>
+        document.getElementById('lab1-link').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            const password = prompt("Enter the password to access the Lab 1 summary:");
+            if (password) {
+                fetch('/lab1', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password: password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        const errorMessage = document.getElementById('error-message-lab1');
+                        errorMessage.textContent = data.message;
+                        errorMessage.style.display = 'block';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    </script>
+
 </body>
 </html>
