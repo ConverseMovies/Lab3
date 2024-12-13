@@ -17,15 +17,11 @@
     </div>
 
     <script>
-    // Generate tab ID if not exists
-    if (!sessionStorage.getItem('tabId')) {
-        sessionStorage.setItem('tabId', Date.now().toString(36) + Math.random().toString(36).substr(2));
-    }
-
     function submitPassword() {
         const password = document.getElementById('password').value;
-        const tabId = sessionStorage.getItem('tabId');
-        const nextUrl = new URLSearchParams(window.location.search).get('next') || '/';
+        // Get the 'next' parameter from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const nextUrl = urlParams.get('next') || '/';
 
         fetch('/login', {
             method: 'POST',
@@ -35,20 +31,22 @@
             },
             body: JSON.stringify({ 
                 password: password,
-                tabId: tabId,
                 next: nextUrl
             })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                sessionStorage.setItem('authenticated', 'true');
+                // Use the redirect_url from the response
                 window.location.href = data.redirect_url;
             } else {
                 alert("Incorrect password. Please try again.");
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred. Please try again.");
+        });
     }
 
     // Allow Enter key to submit

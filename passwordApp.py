@@ -79,14 +79,22 @@ def login():
             # Make the session permanent
             session.permanent = True
             session['authenticated'] = True
-            next_page = request.args.get('next', '/')
-            # Remove any domain prefix if present
-            if '://' in next_page:
-                next_page = '/' + next_page.split('/', 3)[-1]
+            
+            # Get the next URL from either JSON body or query parameters
+            next_url = request.json.get('next') or request.args.get('next') or '/'
+            
+            # Clean up the next_url
+            if '://' in next_url:
+                # Extract path from full URL
+                next_url = '/' + next_url.split('/', 3)[-1]
+            elif not next_url.startswith('/'):
+                next_url = '/' + next_url
+                
             return jsonify({
                 "success": True,
-                "redirect_url": next_page
+                "redirect_url": next_url
             })
+            
         return jsonify({"success": False, "message": "Incorrect password"})
     
     return render_template('login.html')
