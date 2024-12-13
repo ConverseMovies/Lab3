@@ -5,27 +5,24 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const targetUrl = getTargetUrl(this.id);
             
-            // Check if we're authenticated first
             fetch('/check-auth', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
-                }
+                },
+                credentials: 'same-origin'  // Important for session cookies
             })
             .then(response => response.json())
             .then(data => {
                 if (data.authenticated) {
-                    // If authenticated, go directly to the page
                     window.location.href = targetUrl;
                 } else {
-                    // If not authenticated, go to login with relative path
-                    window.location.href = `/login?next=${targetUrl}`;
+                    window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
                 }
             })
             .catch(() => {
-                // On error, go to login
-                window.location.href = `/login?next=${targetUrl}`;
+                window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
             });
         });
     });

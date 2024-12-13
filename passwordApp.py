@@ -28,6 +28,12 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.route('/check-auth', methods=['POST'])
+def check_auth():
+    return jsonify({
+        "authenticated": 'authenticated' in session
+    })
+
 @app.route('/submit-message', methods=['POST'])
 def submit_message():
     # Get the message from the form
@@ -74,28 +80,33 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        password = request.json.get('password')
+        if request.is_json:
+            password = request.json.get('password')
+        else:
+            password = request.form.get('password')
+
         if password == read_password():
-            # Make the session permanent
             session.permanent = True
             session['authenticated'] = True
             
-            # Get the next URL from either JSON body or query parameters
             next_url = request.json.get('next') or request.args.get('next') or '/'
             
             # Clean up the next_url
             if '://' in next_url:
-                # Extract path from full URL
-                next_url = '/' + next_url.split('/', 3)[-1]
+                next_url = urlparse(next_url).path
             elif not next_url.startswith('/'):
                 next_url = '/' + next_url
                 
-            return jsonify({
-                "success": True,
-                "redirect_url": next_url
-            })
+            if request.is_json:
+                return jsonify({
+                    "success": True,
+                    "redirect_url": next_url
+                })
+            return redirect(next_url)
             
-        return jsonify({"success": False, "message": "Incorrect password"})
+        if request.is_json:
+            return jsonify({"success": False, "message": "Incorrect password"})
+        return render_template('login.html', error="Incorrect password")
     
     return render_template('login.html')
 
