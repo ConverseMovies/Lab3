@@ -5,12 +5,7 @@ import secrets
 from datetime import timedelta
 from datetime import datetime
 from urllib.parse import urlparse
-import logging
 
-
-# Set up logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
@@ -28,6 +23,24 @@ def login_required(f):
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
+
+def clean_path(url):
+    """Clean URL to get proper path"""
+    if not url:
+        return '/'
+        
+    if url.startswith('http'):
+        # Parse URL and get path
+        parsed = urlparse(url)
+        path = parsed.path
+    else:
+        path = url
+        
+    # Remove any leading or trailing slashes
+    path = path.strip('/')
+    
+    # Add single leading slash
+    return f'/{path}' if path else '/'
 
 @app.route('/submit-message', methods=['POST'])
 def submit_message():
@@ -72,13 +85,6 @@ def view_message(filename):
 def index():
     return render_template('index.html')
 
-@app.route('/check-auth', methods=['POST'])
-def check_auth():
-    """Endpoint to check if user is authenticated"""
-    is_auth = 'authenticated' in session
-    logger.debug(f"Auth check: {is_auth}")
-    return jsonify({"authenticated": is_auth})
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -87,9 +93,7 @@ def login():
             session['logged_in'] = True
             next_page = request.args.get('next')
             if next_page:
-                # Get just the path part if it's a full URL
-                path = next_page.split('/', 3)[-1] if next_page.startswith('http') else next_page
-                return redirect('/' + path)
+                return redirect(clean_path(next_page))
             return redirect(url_for('index'))
         return 'Invalid password'
     return render_template('login.html')
@@ -103,65 +107,50 @@ def logout():
 @app.route('/lab1_summary')
 @login_required
 def lab1_summary():
-    logger.debug("Accessing lab1_summary")
     return render_template('lab1.html')
 
 @app.route('/lab2_summary')
 @login_required
 def lab2_summary():
-    logger.debug("Accessing lab2_summary")
     return render_template('lab2.html')
 
 @app.route('/lab3_summary')
 @login_required
 def lab3_summary():
-    logger.debug("Accessing lab3_summary")
     return render_template('lab3.html')
 
 @app.route('/aetas_summary')
 @login_required
 def aetas_summary():
-    logger.debug("Accessing aetas_summary")
     return render_template('calendar.html')
 
 @app.route('/logs_list')
 @login_required
 def logs_list():
-    logger.debug("Accessing logs_list")
     return render_template('logs.html')
 
 # Redirect routes
 @app.route('/lab1')
 @login_required
 def lab1():
-    logger.debug("Redirecting from /lab1 to lab1_summary")
     return redirect(url_for('lab1_summary'))
 
 @app.route('/lab2')
 @login_required
 def lab2():
-    logger.debug("Redirecting from /lab2 to lab2_summary")
     return redirect(url_for('lab2_summary'))
 
 @app.route('/lab3')
 @login_required
 def lab3():
-    logger.debug("Redirecting from /lab3 to lab3_summary")
     return redirect(url_for('lab3_summary'))
 
 @app.route('/aetas')
 @login_required
 def aetas():
-    logger.debug("Redirecting from /aetas to aetas_summary")
     return redirect(url_for('aetas_summary'))
 
 
-
-@app.before_request
-def before_request():
-    """Log all requests for debugging"""
-    logger.debug(f"Request to: {request.path}")
-    logger.debug(f"Current session: {session}")
 
 # Team routes (unprotected)
 @app.route('/team/kaylee.html')
