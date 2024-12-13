@@ -1,50 +1,3 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #F7F7F7;
-    color: #000;
-    margin: 0;
-    padding: 0;
-}
-
-header {
-    background-color: #FFD700;
-    color: #000;
-    text-align: center;
-    padding: 20px;
-}
-
-nav ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    text-align: center;
-    background-color: #000;
-}
-
-nav ul li {
-    display: inline;
-    margin: 10px;
-}
-
-nav ul li a {
-    color: #FFD700;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-main {
-    text-align: center;
-    margin: 20px;
-}
-
-a {
-    color: #FFD700;
-    text-decoration: underline;
-}
-
-
-/* NEW STYLE STUFF HEREEEEE */
-
 /* Reset and base styles */
 * {
     margin: 0;
@@ -389,10 +342,6 @@ textarea[disabled] {
     cursor: not-allowed;
 }
 
-/* Lab Page stuff */
-
-
-
 
 /* Bottom of page stuff */
 .bottom-text-container {
@@ -465,8 +414,22 @@ textarea[disabled] {
     width: 200px;
 }
 
+.password-form input:focus{
+    outline: none;
+}
+
 .password-form button {
     padding: 8px 16px;
     cursor: pointer;
+    background-color: #FFCD00;
+    color: #1e1e1e;
+}
+
+.password-form button:hover {
+    background-color: #be9902;
+}
+
+.password-form button:active{
+    transform: translateY(4px);
 }
 
