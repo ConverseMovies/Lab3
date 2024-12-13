@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logs</title>
+    <title>Message Logs</title>
     <link rel="stylesheet" href="/static/styles.css">
     <script src="/static/passwordCheck.js"></script>
 </head>
@@ -11,14 +11,17 @@
     <div class="grid-bottom"></div>
     
     <div class="profile-container">
-        <h2 class="profile-title" style="padding-bottom: 50px;">cut down trees. trees that have been cut down</h2>
+        <h2 class="profile-title" style="padding-bottom: 50px;">Message Logs</h2>
         <ul class="logs-list">
             {% if message_files %}
                 {% for message_file in message_files %}
                     <li>
                         <a href="{{ url_for('view_message', filename=message_file) }}" class="log-link">
-                            Message sent to {{ message_file.split('_')[1].replace('.html', '') | title }} 
-                            at {{ message_file.split('_')[2].replace('-', ':').replace('.html', '') }}
+                            Message sent to 
+                            {% if 'gavin' in message_file.lower() %}Gavin{% elif 'kaylee' in message_file.lower() %}Kaylee
+                            {% elif 'elizabeth' in message_file.lower() %}Elizabeth{% elif 'luke' in message_file.lower() %}Luke{% else %}Unknown{% endif %}
+                            at {{ message_file.split('_')[2][:2] }}/{{ message_file.split('_')[2][2:4] }}/{{ message_file.split('_')[2][4:8] }} 
+                            {{ message_file.split('_')[2][9:11] }}:{{ message_file.split('_')[2][11:13] }}
                         </a>
                     </li>
                 {% endfor %}
