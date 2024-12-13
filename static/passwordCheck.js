@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Ensure we only use the path portion of the URL
                     if(targetUrl=='/logs_list'){
                         window.location.href = 'login?next=https://aeris-5a3486b752d5.herokuapp.com/logs_list';
+                        alert('urmom');
                     }
                     else if(targetUrl =='/lab1_summary'){
                         window.location.href = 'login?next=https://aeris-5a3486b752d5.herokuapp.com/lab1_summary';
