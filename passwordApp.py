@@ -184,10 +184,7 @@ def lab3():
 def aetas():
     return redirect(url_for('aetas_summary'))
 
-@app.route('/logs')
-@login_required
-def logs():
-    return redirect(url_for('logs_list'))
+
 
 @app.before_request
 def before_request():
