@@ -1,22 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Get tab_id from URL
-    let urlParams = new URLSearchParams(window.location.search);
-    let tabId = urlParams.get('tab_id');
+    // Get or extract tab_id
+    let tabId = extractTabId(window.location.href);
     
-    // If we're on the login page, check for tab_id in the 'next' parameter
-    if (!tabId && window.location.pathname === '/login') {
-        const nextUrl = urlParams.get('next');
-        if (nextUrl) {
-            const nextUrlParams = new URLSearchParams(nextUrl.split('?')[1] || '');
-            tabId = nextUrlParams.get('tab_id');
-        }
-    }
-    
-    // Only generate new tab_id if we don't have one and we're not on login page
-    if (!tabId && !window.location.pathname.includes("/login")) {
-        tabId = generateTabId();
+    // Only generate new if we don't have one and we're not on login page
+    if (!tabId && window.location.pathname !== '/login') {
+        tabId = 'tab-' + Math.random().toString(36).substr(2, 9);
         // Add tab_id to current URL without reloading
-        const newUrl = addTabIdToUrl(window.location.pathname + window.location.search, tabId);
+        const newUrl = cleanAndAddTabId(window.location.pathname + window.location.search, tabId);
         window.history.replaceState({}, '', newUrl);
     }
     
@@ -27,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             let targetUrl = getTargetUrl(this.id);
             if (tabId) {
-                targetUrl = addTabIdToUrl(targetUrl, tabId);
+                targetUrl = cleanAndAddTabId(targetUrl, tabId);
             }
             
             try {
@@ -49,7 +39,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.authenticated) {
                     window.location.replace(window.location.origin + targetUrl);
                 } else {
-                    window.location.replace('/login?next=' + encodeURIComponent(targetUrl));
+                    const loginUrl = '/login?next=' + encodeURIComponent(targetUrl);
+                    window.location.replace(loginUrl);
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
@@ -58,10 +49,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Handle all non-protected internal links
+    // Handle non-protected links
     document.querySelectorAll('a').forEach(link => {
         const href = link.getAttribute('href');
-        // Skip if it's a protected link or special link
         if (link.id && link.id.endsWith('-link')) return;
         if (!href || href.startsWith('http') || href.startsWith('/static/') || href === '#' || href === '/logout') return;
         
@@ -69,25 +59,47 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             let targetUrl = href;
             if (tabId) {
-                targetUrl = addTabIdToUrl(targetUrl, tabId);
+                targetUrl = cleanAndAddTabId(targetUrl, tabId);
             }
             window.location.replace(window.location.origin + targetUrl);
         });
     });
 });
 
-function generateTabId() {
-    return 'tab-' + Math.random().toString(36).substr(2, 9);
+// Extract tab_id from URL, including from 'next' parameter if on login page
+function extractTabId(url) {
+    const urlObj = new URL(url, window.location.origin);
+    
+    // First check direct tab_id in URL
+    let tabId = urlObj.searchParams.get('tab_id');
+    
+    // If we're on login page and no direct tab_id, check 'next' parameter
+    if (!tabId && urlObj.pathname === '/login') {
+        const nextParam = urlObj.searchParams.get('next');
+        if (nextParam) {
+            // Try to extract tab_id from the 'next' URL
+            const nextUrl = new URL(nextParam, window.location.origin);
+            tabId = nextUrl.searchParams.get('tab_id');
+        }
+    }
+    
+    return tabId;
 }
 
-function addTabIdToUrl(url, tabId) {
+// Clean URL and add tab_id
+function cleanAndAddTabId(url, tabId) {
     if (!tabId) return url;
-    // Handle both relative and absolute URLs
-    if (url.includes('?')) {
-        return url + '&tab_id=' + tabId;
-    } else {
-        return url + '?tab_id=' + tabId;
-    }
+    
+    // Parse the URL
+    const urlObj = new URL(url, window.location.origin);
+    
+    // Remove any existing tab_id parameters
+    urlObj.searchParams.delete('tab_id');
+    
+    // Add the new tab_id
+    urlObj.searchParams.set('tab_id', tabId);
+    
+    return urlObj.pathname + urlObj.search;
 }
 
 function getTargetUrl(linkId) {
