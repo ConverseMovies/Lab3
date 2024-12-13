@@ -19,7 +19,11 @@ app.config.update(
     # Add these new settings
     PREFERRED_URL_SCHEME='https',
     SESSION_COOKIE_DOMAIN=None,  # Allow the cookie to work across subdomains
-    MAX_CONTENT_LENGTH=16 * 1024 * 1024  # 16MB max-size
+    MAX_CONTENT_LENGTH=16 * 1024 * 1024,  # 16MB max-size
+    PERMANENT_SESSION=False,           # Don't make sessions permanent
+    SESSION_PERMANENT=False,           # Reinforcing the non-permanent setting
+    SESSION_COOKIE_SECURE=True,        # Ensure HTTPS only
+    SESSION_COOKIE_PATH='/'            # Set cookie path
 )
 app.secret_key = 'MMMCOOKIESSSS-said-cookie-monster-hungrily' 
 
@@ -102,7 +106,6 @@ def login():
 
         if password == read_password():
             # Set up session
-            session.permanent = True
             session['authenticated'] = True
             session.modified = True
             
@@ -133,9 +136,6 @@ def before_request():
         if request.url.startswith('http://'):
             url = request.url.replace('http://', 'https://', 1)
             return redirect(url, code=301)
-    
-    # Set session permanent at the start
-    session.permanent = True
     
     # Always refresh the session
     if 'authenticated' in session:
