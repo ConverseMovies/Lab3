@@ -363,6 +363,16 @@ textarea:focus{
     transform: translateY(4px);
 }
 
+#message-status {
+    height: 1.5em; /* Reserve space for the message */
+    line-height: 1.5em; /* Center the text vertically */
+    text-align: center; /* Center the text horizontally */
+    display: none; /* Hidden by default */
+    color: green;
+    margin-top: 10px; /* Add spacing between the button and the status */
+    transition: opacity 0.3s ease; /* Smooth transition when appearing */
+}
+
 /* Lab Page stuff */
 
 
