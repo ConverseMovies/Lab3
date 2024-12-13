@@ -19,8 +19,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     handleProtectedLink(this.id);
                 } else {
                     // Ensure we only use the path portion of the URL
+                    if(targetUrl=='/logs_list'){
+                        window.location.href = 'login?next=/logs_list';
+                    }
+                    else{
                     const path = new URL(targetUrl, window.location.origin).pathname;
                     window.location.href = `/login?next=${encodeURIComponent(path)}`;
+                    }
                 }
             })
             .catch(error => {
