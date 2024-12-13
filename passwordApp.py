@@ -2,8 +2,11 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from functools import wraps
 import os
 import secrets
+from datetime import timedelta
+from datetime import datetime
 from urllib.parse import urlparse
 import logging
+
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -11,22 +14,6 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
-
-def clean_redirect_url(url):
-    """Clean and validate redirect URL to ensure it's a local path"""
-    if not url:
-        return '/'
-    
-    # If it's already just a path, return it
-    if url.startswith('/'):
-        return url
-        
-    # If it's a full URL, extract just the path
-    try:
-        parsed = urlparse(url)
-        return parsed.path or '/'
-    except:
-        return '/'
 
 def read_password(file_path="password.txt"):
     """Reads the password from the password.txt file."""
@@ -36,15 +23,9 @@ def read_password(file_path="password.txt"):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        logger.debug(f"Checking auth for route: {request.path}")
-        logger.debug(f"Session contents: {session}")
-        
-        if 'authenticated' not in session:
-            logger.debug("No auth in session, redirecting to login")
-            next_url = request.url
-            return redirect(url_for('login', next=next_url))
-        
-        logger.debug("User is authenticated, proceeding")
+        if 'logged_in' not in session:
+            # Remember where the user was trying to go
+            return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -101,33 +82,16 @@ def check_auth():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        logger.debug("Processing login POST request")
-        user_password = request.json.get('password')
-        actual_password = read_password()
-        
-        if user_password == actual_password:
-            session.clear()
-            session['authenticated'] = True
-            session.modified = True
-            
-            # Clean the next URL
-            next_url = request.json.get('next') or request.args.get('next')
-            cleaned_next = clean_redirect_url(next_url)
-            logger.debug(f"Login successful, redirecting to: {cleaned_next}")
-            
-            return jsonify({
-                "success": True,
-                "redirect_url": cleaned_next
-            })
-        
-        logger.debug("Login failed - incorrect password")
-        return jsonify({"success": False, "message": "Incorrect password."})
-    
-    # For GET requests
-    next_url = request.args.get('next', '')
-    cleaned_next = clean_redirect_url(next_url)
-    logger.debug(f"Showing login page with next URL: {cleaned_next}")
-    session['next_url'] = cleaned_next  # Store the next URL in session
+        password = request.form.get('password')
+        if password == read_password():
+            session['logged_in'] = True
+            next_page = request.args.get('next')
+            if next_page:
+                # Get just the path part if it's a full URL
+                path = next_page.split('/', 3)[-1] if next_page.startswith('http') else next_page
+                return redirect('/' + path)
+            return redirect(url_for('index'))
+        return 'Invalid password'
     return render_template('login.html')
 
 @app.route('/logout')

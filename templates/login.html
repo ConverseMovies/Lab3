@@ -11,57 +11,11 @@
         <h1>Protected Content</h1>
         <p>Please enter the password to access this content.</p>
         <div class="password-form">
-            <input type="password" id="password" placeholder="Enter password">
-            <button onclick="submitPassword()">Submit</button>
+            <form method="post">
+                <input type="password" name="password" placeholder="Enter password">
+                <button type="submit">Submit</button>
+            </form>
         </div>
     </div>
-
-    <script>
-    function submitPassword() {
-        const password = document.getElementById('password').value;
-        // Get next URL and ensure it's just the path
-        let nextUrl = new URLSearchParams(window.location.search).get('next') || '/';
-        
-        // If it's a full URL, extract just the path
-        if (nextUrl.startsWith('http')) {
-            try {
-                nextUrl = new URL(nextUrl).pathname;
-            } catch {
-                nextUrl = '/';
-            }
-        }
-
-        fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({ 
-                password: password,
-                next: nextUrl
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = data.redirect_url;
-            } else {
-                alert("Incorrect password. Please try again.");
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("An error occurred. Please try again.");
-        });
-    }
-
-    // Allow Enter key to submit
-    document.getElementById('password').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            submitPassword();
-        }
-    });
-    </script>
 </body>
 </html>
