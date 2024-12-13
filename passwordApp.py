@@ -5,6 +5,7 @@ import secrets
 from datetime import timedelta
 from datetime import datetime
 from urllib.parse import urlparse
+import uuid
 
 
 app = Flask(__name__)
@@ -103,18 +104,18 @@ def login():
             password = request.form.get('password')
 
         if password == read_password():
-            # Set up session
+            session.permanent = True
             session['authenticated'] = True
-            session.modified = True
+            session['tab_id'] = str(uuid.uuid4())  # Generate unique tab ID
             
             next_url = request.json.get('next') or request.args.get('next') or '/'
             
-            # Clean up the next_url
-            if '://' in next_url:
-                next_url = urlparse(next_url).path
-            elif not next_url.startswith('/'):
-                next_url = '/' + next_url
-                
+            # Add tab_id to the redirect URL
+            if '?' in next_url:
+                next_url = f"{next_url}&tab_id={session['tab_id']}"
+            else:
+                next_url = f"{next_url}?tab_id={session['tab_id']}"
+            
             if request.is_json:
                 return jsonify({
                     "success": True,
@@ -135,9 +136,17 @@ def before_request():
             url = request.url.replace('http://', 'https://', 1)
             return redirect(url, code=301)
     
-    # Always refresh the session
+    # Check for tab_id in authenticated sessions
     if 'authenticated' in session:
-        session.modified = True
+        current_tab = request.args.get('tab_id')
+        session_tab = session.get('tab_id')
+        
+        # If no tab_id match, require re-authentication
+        if not current_tab or not session_tab or current_tab != session_tab:
+            session.clear()
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({"authenticated": False}), 401
+            return redirect(url_for('login', next=request.path))
 
 @app.route('/logout')
 def logout():
