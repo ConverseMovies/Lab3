@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
+    <title>Message to {{ recipient }} on {{ date }} at {{ time }}</title>
     <link rel="stylesheet" href="/static/styles.css">
     <script src="/static/passwordCheck.js"></script>
 </head>
@@ -37,7 +37,7 @@
     
     <!-- Message Section -->
     <div class="profile-container">
-        <h2 class="profile-title">{{ title }}</h2>
+        <h2 class="profile-title">Message to {{ recipient }} on {{ date }} at {{ time }}</h2>
         <div class="content-section">
             <p class="profile-description">{{ message }}</p>
         </div>
@@ -46,6 +46,5 @@
             <a href="/logs" id="logs-link" class="bottom-text">logs</a>
         </div>
     </div>
-    
 </body>
 </html>

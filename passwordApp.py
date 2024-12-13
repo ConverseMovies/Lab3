@@ -85,21 +85,33 @@ def submit_message():
     sender = request.form.get('sender', '').strip()  # Retrieve sender from hidden input
     
     if message and sender:
-        # Create a unique filename based on the sender and timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Get current date and time for the title
+        now = datetime.now()
+        date_str = now.strftime("%B %d, %Y")  # Example: "December 13, 2024"
+        time_str = now.strftime("%I:%M %p")   # Example: "02:45 PM"
+
+        # Create a unique filename
+        timestamp = now.strftime("%Y%m%d_%H%M%S")
         filename = f"message_{sender}_{timestamp}.html"
         filepath = os.path.join(MESSAGE_DIR, filename)
         
-        # Generate HTML content using a consistent template
-        html_content = render_template('message_template.html', 
-                                        title=f"Message to {sender.capitalize()}", 
-                                        message=message)
+        # Generate HTML content using the template
+        html_content = render_template(
+            'message_template.html',
+            recipient=sender.capitalize(),
+            date=date_str,
+            time=time_str,
+            message=message
+        )
         
-        # Save the message as an HTML file
+        # Save the HTML content to a file
         with open(filepath, 'w') as file:
             file.write(html_content)
-    
-    return jsonify({"success": True})
+        
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "error": "Invalid message or sender"}), 400
+
 
 
 
