@@ -5,6 +5,10 @@ import secrets
 from datetime import timedelta
 import logging
 
+# Store message
+MESSAGE_DIR = "messages"
+os.makedirs(MESSAGE_DIR, exist_ok=True)
+
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -41,6 +45,47 @@ def login_required(f):
         logger.debug("User is authenticated")
         return f(*args, **kwargs)
     return decorated_function
+
+
+@app.route('/submit-message', methods=['POST'])
+def submit_message():
+    # Get the message from the form
+    message = request.form.get('message', '').strip()
+    
+    if message:
+        # Create a unique filename based on the timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"message_{timestamp}.html"
+        filepath = os.path.join(MESSAGE_DIR, filename)
+        
+        # Save the message as an HTML file
+        with open(filepath, 'w') as file:
+            file.write(f"<html><body><h1>Message</h1><p>{message}</p></body></html>")
+        
+        # Optionally send an email (example placeholder code)
+        send_email("gavin-egger@uiowa.edu", "New Message Received", message)
+        
+    return redirect(url_for('logs'))
+
+def send_email(to_email, subject, body):
+    # Placeholder function for sending email
+    # Use Flask-Mail, smtplib, or any email service here
+    print(f"Sending email to {to_email}: {subject}\n{body}")
+
+@app.route('/logs')
+def logs():
+    # Get all message files
+    message_files = sorted(os.listdir(MESSAGE_DIR), reverse=True)
+    return render_template('logs.html', message_files=message_files)
+
+@app.route('/messages/<filename>')
+def view_message(filename):
+    filepath = os.path.join(MESSAGE_DIR, filename)
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as file:
+            return file.read()
+    return "Message not found", 404
+
 
 @app.route('/')
 def index():
