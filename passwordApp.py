@@ -8,7 +8,10 @@ from urllib.parse import urlparse
 
 
 app = Flask(__name__)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 app.secret_key = secrets.token_hex(32)
+
+
 
 def read_password(file_path="password.txt"):
     """Reads the password from the password.txt file."""
@@ -18,29 +21,12 @@ def read_password(file_path="password.txt"):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'logged_in' not in session:
-            # Remember where the user was trying to go
-            return redirect(url_for('login', next=request.url))
+        if 'authenticated' not in session:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({"authenticated": False}), 401
+            return redirect(url_for('login', next=request.path))
         return f(*args, **kwargs)
     return decorated_function
-
-def clean_path(url):
-    """Clean URL to get proper path"""
-    if not url:
-        return '/'
-        
-    if url.startswith('http'):
-        # Parse URL and get path
-        parsed = urlparse(url)
-        path = parsed.path
-    else:
-        path = url
-        
-    # Remove any leading or trailing slashes
-    path = path.strip('/')
-    
-    # Add single leading slash
-    return f'/{path}' if path else '/'
 
 @app.route('/submit-message', methods=['POST'])
 def submit_message():
@@ -88,14 +74,21 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        password = request.form.get('password')
+        password = request.json.get('password')
         if password == read_password():
-            session['logged_in'] = True
-            next_page = request.args.get('next')
-            if next_page:
-                return redirect(clean_path(next_page))
-            return redirect(url_for('index'))
-        return 'Invalid password'
+            # Make the session permanent
+            session.permanent = True
+            session['authenticated'] = True
+            next_page = request.args.get('next', '/')
+            # Remove any domain prefix if present
+            if '://' in next_page:
+                next_page = '/' + next_page.split('/', 3)[-1]
+            return jsonify({
+                "success": True,
+                "redirect_url": next_page
+            })
+        return jsonify({"success": False, "message": "Incorrect password"})
+    
     return render_template('login.html')
 
 @app.route('/logout')
