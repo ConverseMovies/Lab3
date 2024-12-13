@@ -150,7 +150,7 @@ def login():
 @app.before_request
 def before_request():
     # Skip auth check for static files
-    if request.path.startswith('/static/'):
+    if request.path.startswith('/static/') and not 'authenticated' in session:
         return
         
     if not request.is_secure and not request.headers.get('X-Forwarded-Proto', 'http') == 'https':
@@ -168,11 +168,6 @@ def before_request():
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({"authenticated": False}), 401
             return redirect(url_for('login', next=request.full_path))
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
 
 # Protected routes
 @app.route('/lab1_summary')
