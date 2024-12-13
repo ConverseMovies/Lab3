@@ -1,19 +1,20 @@
 document.addEventListener('DOMContentLoaded', function () {
-    console.log("DOM Content Loaded");
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabId = urlParams.get('tab_id');
     
-    const protectedLinks = document.querySelectorAll('[id$="-link"]');
-    console.log("Found protected links:", protectedLinks.length);
-    
-    protectedLinks.forEach(link => {
+    // Handle protected links
+    document.querySelectorAll('[id$="-link"]').forEach(link => {
         link.addEventListener('click', async function (e) {
-            console.log("Link clicked:", this.id);
+            console.log("Protected link clicked:", this.id);
             e.preventDefault();
             
-            const targetUrl = getTargetUrl(this.id);
-            console.log("Target URL:", targetUrl);
+            let targetUrl = getTargetUrl(this.id);
+            if (tabId) {
+                targetUrl = addTabIdToUrl(targetUrl, tabId);
+            }
+            console.log("Target URL with tab:", targetUrl);
             
             try {
-                console.log("Sending auth check...");
                 const response = await fetch('/check-auth', {
                     method: 'POST',
                     headers: {
@@ -23,21 +24,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     credentials: 'same-origin'
                 });
                 
-                console.log("Auth check response:", response.status);
-                
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 
                 const data = await response.json();
-                console.log("Auth data:", data);
                 
                 if (data.authenticated) {
-                    console.log("Authenticated, redirecting to:", targetUrl);
-                    // Force a proper redirect by ensuring we have the full URL
                     window.location.replace(window.location.origin + targetUrl);
                 } else {
-                    console.log("Not authenticated, redirecting to login");
                     window.location.replace('/login?next=' + encodeURIComponent(targetUrl));
                 }
             } catch (error) {
@@ -46,7 +41,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // Handle all other internal links (non-protected)
+    document.querySelectorAll('a:not([id$="-link"])').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('http') && !href.startsWith('/static/') && href !== '#' && href !== '/logout') {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                let targetUrl = href;
+                if (tabId) {
+                    targetUrl = addTabIdToUrl(targetUrl, tabId);
+                }
+                console.log("Non-protected link clicked, redirecting to:", targetUrl);
+                window.location.replace(window.location.origin + targetUrl);
+            });
+        }
+    });
 });
+
+function addTabIdToUrl(url, tabId) {
+    if (!tabId) return url;
+    const urlObj = new URL(url, window.location.origin);
+    urlObj.searchParams.set('tab_id', tabId);
+    return urlObj.pathname + urlObj.search;
+}
 
 function getTargetUrl(linkId) {
     const urlMap = {
