@@ -6,6 +6,7 @@
     <title>elizabeth</title>
     <link rel="stylesheet" href="/static/styles.css">
     <script src="/static/passwordCheck.js"></script>
+    <script src="/static/messageForm.js" defer></script>
 </head>
 <body>
     <div class="grid-bottom"></div>
@@ -33,10 +34,15 @@
 
         <h2 class="profile-title">send elizabeth a message:</h2>
 
-        <form method="POST" action="https://formsubmit.co/elizabeth-g-stone@uiowa.edu">
-            <textarea name="message" placeholder="enter message"></textarea>
+        <form id="message-form">
+            <textarea id="message-input" name="message" placeholder="enter message"></textarea>
+            <input type="hidden" id="email-recipient" name="_email" value="elizabeth-g-stone@uiowa.edu"> <!-- Hidden email recipient -->
             <button class="send-msg-btn" type="submit">send</button>
         </form>
+        <div id="message-status-container">
+            <p id="message-status" style="display: none;">Message sent!</p>
+        </div>
+
         <div class="bottom-text-container">
             <a href="/" class="bottom-text">aeris</a>
             <a href="/logs" id="logs-link" class="bottom-text">logs</a>
