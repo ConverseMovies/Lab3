@@ -1,10 +1,19 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Get or generate tab_id immediately
+    // Get tab_id from URL
     let urlParams = new URLSearchParams(window.location.search);
     let tabId = urlParams.get('tab_id');
     
-    // If no tab_id exists yet, generate one and add it to the URL
-    if (!tabId) {
+    // If we're on the login page, check for tab_id in the 'next' parameter
+    if (!tabId && window.location.pathname === '/login') {
+        const nextUrl = urlParams.get('next');
+        if (nextUrl) {
+            const nextUrlParams = new URLSearchParams(nextUrl.split('?')[1] || '');
+            tabId = nextUrlParams.get('tab_id');
+        }
+    }
+    
+    // Only generate new tab_id if we don't have one and we're not on login page
+    if (!tabId && window.location.pathname !== '/login') {
         tabId = generateTabId();
         // Add tab_id to current URL without reloading
         const newUrl = addTabIdToUrl(window.location.pathname + window.location.search, tabId);
@@ -17,7 +26,9 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             
             let targetUrl = getTargetUrl(this.id);
-            targetUrl = addTabIdToUrl(targetUrl, tabId);
+            if (tabId) {
+                targetUrl = addTabIdToUrl(targetUrl, tabId);
+            }
             
             try {
                 const response = await fetch('/check-auth', {
@@ -56,24 +67,28 @@ document.addEventListener('DOMContentLoaded', function () {
         
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            const targetUrl = addTabIdToUrl(href, tabId);
+            let targetUrl = href;
+            if (tabId) {
+                targetUrl = addTabIdToUrl(targetUrl, tabId);
+            }
             window.location.replace(window.location.origin + targetUrl);
         });
     });
 });
 
-// Generate a random tab ID
 function generateTabId() {
     return 'tab-' + Math.random().toString(36).substr(2, 9);
 }
 
 function addTabIdToUrl(url, tabId) {
     if (!tabId) return url;
-    const urlObj = new URL(url, window.location.origin);
-    urlObj.searchParams.set('tab_id', tabId);
-    return urlObj.pathname + urlObj.search;
+    // Handle both relative and absolute URLs
+    if (url.includes('?')) {
+        return url + '&tab_id=' + tabId;
+    } else {
+        return url + '?tab_id=' + tabId;
+    }
 }
-
 
 function getTargetUrl(linkId) {
     const urlMap = {
