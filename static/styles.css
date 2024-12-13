@@ -435,3 +435,17 @@ textarea[disabled] {
     transform: translateY(4px);
 }
 
+.image-border {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.image-border img {
+    border: 2px solid white; /* Thin white border */
+    box-sizing: border-box; /* Include border in width/height */
+    height: auto;
+    max-width: 400px;
+}
