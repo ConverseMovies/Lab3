@@ -5,21 +5,26 @@ document.addEventListener('DOMContentLoaded', function () {
         const messageInput = document.getElementById('message-input');
         const messageStatus = document.getElementById('message-status');
         const emailRecipient = document.getElementById('email-recipient').value;
-        const recipientName = document.getElementById('recipient-name').value; // Get the recipient's name
+        const recipientName = document.getElementById('recipient-name').value;
+        const sendButton = document.querySelector('.send-msg-btn'); // Button selector
 
         // Check if the message input is empty
         if (!messageInput.value.trim()) {
-            // Show an error message if the input is empty
             messageStatus.style.display = 'block';
             messageStatus.style.color = 'red';
             messageStatus.textContent = 'Message cannot be empty!';
             
-            // Hide the message after 3 seconds
             setTimeout(() => {
                 messageStatus.style.display = 'none';
             }, 3000);
-            return; // Exit the function early
+            return;
         }
+
+        // Disable the button and gray out the textarea
+        sendButton.disabled = true;
+        sendButton.style.backgroundColor = '#cccccc'; // Optional: change to a disabled-looking color
+        messageInput.style.backgroundColor = '#dddddd'; // Gray out the textarea
+        messageInput.style.pointerEvents = 'none'; // Prevent further typing
 
         // Send the message to the server
         fetch('/submit-message', {
@@ -29,12 +34,11 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: new URLSearchParams({ 
                 message: messageInput.value,
-                sender: recipientName // Include the recipient's name in the request
+                sender: recipientName
             })
         })
         .then(response => {
             if (response.ok) {
-                // Send the email
                 return fetch('https://formsubmit.co/ajax/' + emailRecipient, {
                     method: 'POST',
                     headers: {
@@ -48,13 +52,17 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => {
             if (response.ok) {
-                // Clear the input field and show a success message
-                messageInput.value = '';
+                messageInput.value = ''; // Clear the input field
+                messageInput.style.backgroundColor = ''; // Reset the background color
+                messageInput.style.pointerEvents = 'auto'; // Enable typing again
+
+                sendButton.disabled = false; // Enable the button
+                sendButton.style.backgroundColor = ''; // Reset button color
+
                 messageStatus.style.display = 'block';
                 messageStatus.style.color = 'green';
                 messageStatus.textContent = 'Message sent!';
                 
-                // Hide the message after 3 seconds
                 setTimeout(() => {
                     messageStatus.style.display = 'none';
                 }, 3000);
@@ -64,9 +72,16 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => {
             console.error('Error:', error);
+
             messageStatus.style.display = 'block';
             messageStatus.style.color = 'red';
             messageStatus.textContent = 'Failed to send message. Please try again.';
+            
+            // Re-enable input and button after error
+            messageInput.style.backgroundColor = '';
+            messageInput.style.pointerEvents = 'auto';
+            sendButton.disabled = false;
+            sendButton.style.backgroundColor = '';
         });
     });
 });

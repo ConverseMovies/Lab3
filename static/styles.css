@@ -376,6 +376,19 @@ textarea:focus{
     transition: opacity 0.3s ease; /* Smooth transition when appearing */
 }
 
+
+/* Disabled button styling */
+.send-msg-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Disabled textarea styling */
+textarea[disabled] {
+    background-color: #dddddd;
+    cursor: not-allowed;
+}
+
 /* Lab Page stuff */
 
 
