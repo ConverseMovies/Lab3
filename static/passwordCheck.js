@@ -20,10 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     // Ensure we only use the path portion of the URL
                     if(targetUrl=='/logs_list'){
-                        window.location.href = 'login?next=/logs_list';
+                        window.location.href = 'login?next=https://aeris-5a3486b752d5.herokuapp.com/logs_list';
                     }
                     else if(targetUrl =='/lab1_summary'){
-                        window.location.href = 'login?next=/lab1_summary';
+                        window.location.href = 'login?next=https://aeris-5a3486b752d5.herokuapp.com/lab1_summary';
                     }
                     else{
                     const path = new URL(targetUrl, window.location.origin).pathname;
