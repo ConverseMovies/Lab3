@@ -45,10 +45,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle all other internal links (non-protected)
     document.querySelectorAll('a:not([id$="-link"])').forEach(link => {
         const href = link.getAttribute('href');
-        // Check if it's an internal link that's not a static resource or special link
+        // Check if it's an internal link (including static files) but not special links
         if (href && 
             !href.startsWith('http') && 
-            !href.startsWith('/static/') && 
             href !== '#' && 
             href !== '/logout') {
             
