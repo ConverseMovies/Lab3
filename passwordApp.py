@@ -73,8 +73,8 @@ def submit_message():
         
         # Optionally send an email (example placeholder code)
         send_email("gavin-egger@uiowa.edu", "New Message Received", message)
-        
-    return redirect(url_for('logs'))
+    
+    return jsonify({"success": True})
 
 def send_email(to_email, subject, body):
     # Placeholder function for sending email

@@ -22,10 +22,19 @@
             <img src = "/static/gavinEgger2.jpg" alt="eWilson" style="width: 300; position: relative; left: 30px;">
         </div>
         <h2 class="profile-title">send gavin a message:</h2>
-        <form method="POST" action="/submit-message">
-            <textarea name="message" placeholder="enter message"></textarea>
+
+
+        <form id="message-form">
+            <textarea id="message-input" name="message" placeholder="enter message"></textarea>
             <button class="send-msg-btn" type="submit">send</button>
         </form>
+        <p id="message-status" style="display: none; color: green;">Message sent!</p>
+        
+        
+        <!-- <form method="POST" action="/submit-message">
+            <textarea name="message" placeholder="enter message"></textarea>
+            <button class="send-msg-btn" type="submit">send</button>
+        </form> -->
         <div class="bottom-text-container">
             <a href="/" class="bottom-text">aeris</a>
             <a href="/logs" class="bottom-text">logs</a>
@@ -56,6 +65,45 @@
             </div>
         </div>
     </nav>
+
+    <script>
+        document.getElementById('message-form').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent the form from submitting the traditional way
+    
+            const messageInput = document.getElementById('message-input');
+            const messageStatus = document.getElementById('message-status');
+    
+            // Send the message via AJAX
+            fetch('/submit-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ message: messageInput.value })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Clear the input field and show a success message
+                    messageInput.value = '';
+                    messageStatus.style.display = 'block';
+                    messageStatus.textContent = 'Message sent!';
+                    
+                    // Hide the message after 3 seconds
+                    setTimeout(() => {
+                        messageStatus.style.display = 'none';
+                    }, 3000);
+                } else {
+                    throw new Error('Failed to send message');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                messageStatus.style.display = 'block';
+                messageStatus.style.color = 'red';
+                messageStatus.textContent = 'Failed to send message. Please try again.';
+            });
+        });
+    </script>
 
 
 </body>
