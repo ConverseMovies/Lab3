@@ -80,23 +80,19 @@ def login_required(f):
 
 @app.route('/submit-message', methods=['POST'])
 def submit_message():
-    # Get the message and recipient from the form
+    # Get the message and sender from the form
     message = request.form.get('message', '').strip()
-    recipient_email = request.form.get('_email', '').strip()
-    recipient = recipient_email.split('@')[0]  # Extract recipient's name from email
-
-    if message:
-        # Create a unique filename with recipient name and timestamp
+    sender = request.form.get('sender', '').strip()  # Retrieve sender from hidden input
+    
+    if message and sender:
+        # Create a unique filename based on the sender and timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"message_{recipient}_{timestamp}.html"
+        filename = f"message_{sender}_{timestamp}.html"
         filepath = os.path.join(MESSAGE_DIR, filename)
         
         # Save the message as an HTML file
         with open(filepath, 'w') as file:
             file.write(f"<html><body><h1>Message</h1><p>{message}</p></body></html>")
-        
-        # Optionally send an email
-        send_email(recipient_email, "New Message Received", message)
     
     return jsonify({"success": True})
 
