@@ -1,25 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Get tab ID either from URL or from hidden input
     const urlParams = new URLSearchParams(window.location.search);
-    let tabId = urlParams.get('tab_id');
-    
-    // Check for hidden input if no tab ID in URL
-    if (!tabId) {
-        const hiddenInput = document.getElementById('current-tab-id');
-        if (hiddenInput) {
-            tabId = hiddenInput.value;
-        }
-    }
+    const tabId = urlParams.get('tab_id');
     
     // Handle protected links
     document.querySelectorAll('[id$="-link"]').forEach(link => {
         link.addEventListener('click', async function (e) {
+            console.log("Protected link clicked:", this.id);
             e.preventDefault();
             
             let targetUrl = getTargetUrl(this.id);
             if (tabId) {
                 targetUrl = addTabIdToUrl(targetUrl, tabId);
             }
+            console.log("Target URL with tab:", targetUrl);
             
             try {
                 const response = await fetch('/check-auth', {
@@ -49,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Handle all internal links
     document.querySelectorAll('a').forEach(link => {
         const href = link.getAttribute('href');
         // Skip if it's a protected link, external link, or special link
@@ -73,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
 
 function addTabIdToUrl(url, tabId) {
     if (!tabId) return url;
