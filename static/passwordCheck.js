@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Get the current tab_id from URL or create new one
+    // Get the current tab_id from URL
     const urlParams = new URLSearchParams(window.location.search);
     const tabId = urlParams.get('tab_id');
     
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             let targetUrl = getTargetUrl(this.id);
             
-            // Add tab_id to targetUrl if we have one
+            // Always add the current tab_id if we have one
             if (tabId) {
                 targetUrl = addTabIdToUrl(targetUrl, tabId);
             }
@@ -31,8 +31,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const data = await response.json();
                 
                 if (data.authenticated) {
+                    // Keep the tab_id when navigating
                     window.location.href = targetUrl;
                 } else {
+                    // Pass the target URL with tab_id to login
                     window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
                 }
             } catch (error) {
@@ -43,8 +45,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// Helper function to add tab_id to URLs
 function addTabIdToUrl(url, tabId) {
+    // Handle both relative and absolute URLs
     const urlObj = new URL(url, window.location.origin);
     urlObj.searchParams.set('tab_id', tabId);
     return urlObj.pathname + urlObj.search;

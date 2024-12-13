@@ -106,11 +106,15 @@ def login():
         if password == read_password():
             session.permanent = True
             session['authenticated'] = True
-            session['tab_id'] = str(uuid.uuid4())  # Generate unique tab ID
+            session['tab_id'] = str(uuid.uuid4())
             
             next_url = request.json.get('next') or request.args.get('next') or '/'
             
-            # Add tab_id to the redirect URL
+            # Clean and add tab_id to the next_url
+            if '://' in next_url:
+                next_url = urlparse(next_url).path + ('?' + urlparse(next_url).query if urlparse(next_url).query else '')
+            
+            # Add tab_id to the URL
             if '?' in next_url:
                 next_url = f"{next_url}&tab_id={session['tab_id']}"
             else:
@@ -131,22 +135,25 @@ def login():
 
 @app.before_request
 def before_request():
+    # Skip auth check for static files
+    if request.path.startswith('/static/'):
+        return
+        
     if not request.is_secure and not request.headers.get('X-Forwarded-Proto', 'http') == 'https':
         if request.url.startswith('http://'):
             url = request.url.replace('http://', 'https://', 1)
             return redirect(url, code=301)
     
-    # Check for tab_id in authenticated sessions
-    if 'authenticated' in session:
+    # Only check tab_id for protected routes
+    if 'authenticated' in session and request.endpoint in ['lab1_summary', 'lab2_summary', 'lab3_summary', 'aetas_summary', 'logs_list']:
         current_tab = request.args.get('tab_id')
         session_tab = session.get('tab_id')
         
-        # If no tab_id match, require re-authentication
         if not current_tab or not session_tab or current_tab != session_tab:
             session.clear()
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({"authenticated": False}), 401
-            return redirect(url_for('login', next=request.path))
+            return redirect(url_for('login', next=request.full_path))
 
 @app.route('/logout')
 def logout():
