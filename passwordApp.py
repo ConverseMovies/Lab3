@@ -82,7 +82,9 @@ def send_email(to_email, subject, body):
     print(f"Sending email to {to_email}: {subject}\n{body}")
 
 @app.route('/logs')
+@login_required
 def logs():
+    """Render the logs page, showing all messages."""
     # Ensure the messages directory exists
     if not os.path.exists(MESSAGE_DIR):
         os.makedirs(MESSAGE_DIR)
@@ -196,7 +198,8 @@ def aetas_summary():
 @app.route('/logs_list')
 @login_required
 def logs_list():
-    return render_template('logs.html')
+    """Redirect to the /logs route."""
+    return redirect(url_for('logs'))
 
 # Redirect routes
 @app.route('/lab1')
