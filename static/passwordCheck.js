@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     // Only generate new tab_id if we don't have one and we're not on login page
-    if (!tabId && !window.location.pathname.includes("-link")) {
+    if (!tabId && !window.location.pathname.includes("/login")) {
         tabId = generateTabId();
         // Add tab_id to current URL without reloading
         const newUrl = addTabIdToUrl(window.location.pathname + window.location.search, tabId);
