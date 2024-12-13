@@ -32,14 +32,12 @@ app.secret_key = 'MMMCOOKIESSSS-said-cookie-monster-hungrily'
 
 @app.route('/check-auth', methods=['POST'])
 def check_auth():
+    """Check if the user is authenticated."""
     is_authenticated = 'authenticated' in session
     if is_authenticated:
-        # Force session refresh
+        # Refresh session
         session.modified = True
-        session.permanent = True
-    return jsonify({
-        "authenticated": is_authenticated
-    })
+    return jsonify({"authenticated": is_authenticated})
 
 def read_password(file_path="password.txt"):
     """Reads the password from the password.txt file."""
@@ -109,40 +107,23 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Authenticate the user with a password."""
     if request.method == 'POST':
-        if request.is_json:
-            password = request.json.get('password')
-        else:
-            password = request.form.get('password')
+        password = request.json.get('password') if request.is_json else request.form.get('password')
 
         if password == read_password():
+            # Set session details
             session.permanent = True
             session['authenticated'] = True
             session['tab_id'] = str(uuid.uuid4())
-            
-            next_url = request.json.get('next') or request.args.get('next') or '/'
-            
-            # Clean and add tab_id to the next_url
-            if '://' in next_url:
-                next_url = urlparse(next_url).path + ('?' + urlparse(next_url).query if urlparse(next_url).query else '')
-            
-            # Add tab_id to the URL
-            if '?' in next_url:
-                next_url = f"{next_url}&tab_id={session['tab_id']}"
-            else:
-                next_url = f"{next_url}?tab_id={session['tab_id']}"
-            
-            if request.is_json:
-                return jsonify({
-                    "success": True,
-                    "redirect_url": next_url
-                })
-            return redirect(next_url)
-        
-        if request.is_json:
-            return jsonify({"success": False, "message": "Incorrect password"})
-        return render_template('login.html', error="Incorrect password")
-    
+            next_url = request.args.get('next') or '/'
+            return jsonify({"success": True, "redirect_url": next_url}) if request.is_json else redirect(next_url)
+
+        # Invalid password
+        return jsonify({"success": False, "message": "Incorrect password"}) if request.is_json else render_template(
+            'login.html', error="Incorrect password")
+
+    # Render login page for GET requests
     return render_template('login.html')
 
 @app.before_request

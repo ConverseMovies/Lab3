@@ -31,13 +31,38 @@ document.addEventListener('DOMContentLoaded', function () {
                 const data = await response.json();
                 
                 if (data.authenticated) {
+                    // User is already authenticated
                     window.location.replace(window.location.origin + targetUrl);
                 } else {
-                    window.location.replace('/login?next=' + encodeURIComponent(targetUrl));
+                    // Prompt user for password
+                    const password = prompt("Enter the password:");
+                    if (password) {
+                        const authResponse = await fetch('/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({ password }),
+                            credentials: 'same-origin'
+                        });
+                        
+                        if (authResponse.ok) {
+                            const authData = await authResponse.json();
+                            if (authData.success) {
+                                // Redirect to the target URL after successful login
+                                window.location.replace(window.location.origin + targetUrl);
+                            } else {
+                                alert("Incorrect password. Access denied.");
+                            }
+                        } else {
+                            throw new Error('Login request failed');
+                        }
+                    }
                 }
             } catch (error) {
-                console.error('Auth check failed:', error);
-                window.location.replace('/login?next=' + encodeURIComponent(targetUrl));
+                console.error('Auth check or login failed:', error);
+                alert("An error occurred. Please try again.");
             }
         });
     });
