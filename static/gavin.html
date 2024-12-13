@@ -67,42 +67,57 @@
     </nav>
 
     <script>
-        document.getElementById('message-form').addEventListener('submit', function (e) {
-            e.preventDefault(); // Prevent the form from submitting the traditional way
-    
-            const messageInput = document.getElementById('message-input');
-            const messageStatus = document.getElementById('message-status');
-    
-            // Send the message via AJAX
-            fetch('/submit-message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({ message: messageInput.value })
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Clear the input field and show a success message
-                    messageInput.value = '';
-                    messageStatus.style.display = 'block';
-                    messageStatus.textContent = 'Message sent!';
-                    
-                    // Hide the message after 3 seconds
-                    setTimeout(() => {
-                        messageStatus.style.display = 'none';
-                    }, 3000);
-                } else {
-                    throw new Error('Failed to send message');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
+    document.getElementById('message-form').addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent the form from submitting the traditional way
+
+        const messageInput = document.getElementById('message-input');
+        const messageStatus = document.getElementById('message-status');
+        
+        // Check if the message input is empty
+        if (!messageInput.value.trim()) {
+            // Show an error message if the input is empty
+            messageStatus.style.display = 'block';
+            messageStatus.style.color = 'red';
+            messageStatus.textContent = 'Message cannot be empty!';
+            
+            // Hide the message after 3 seconds
+            setTimeout(() => {
+                messageStatus.style.display = 'none';
+            }, 3000);
+            return; // Exit the function early
+        }
+
+        // Send the message via AJAX
+        fetch('/submit-message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ message: messageInput.value })
+        })
+        .then(response => {
+            if (response.ok) {
+                // Clear the input field and show a success message
+                messageInput.value = '';
                 messageStatus.style.display = 'block';
-                messageStatus.style.color = 'red';
-                messageStatus.textContent = 'Failed to send message. Please try again.';
-            });
+                messageStatus.style.color = 'green'; // Set color to green for success
+                messageStatus.textContent = 'Message sent!';
+                
+                // Hide the message after 3 seconds
+                setTimeout(() => {
+                    messageStatus.style.display = 'none';
+                }, 3000);
+            } else {
+                throw new Error('Failed to send message');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            messageStatus.style.display = 'block';
+            messageStatus.style.color = 'red';
+            messageStatus.textContent = 'Failed to send message. Please try again.';
         });
+    });
     </script>
 
 
