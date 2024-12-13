@@ -13,18 +13,23 @@ app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
-    SESSION_TYPE='filesystem',  # Add this
-    SESSION_COOKIE_NAME='aeris_session',  # Custom session cookie name
-    SESSION_REFRESH_EACH_REQUEST=True  # Important: refreshes session on each request
+    # Remove filesystem session type since Heroku's filesystem is ephemeral
+    SESSION_COOKIE_NAME='aeris_session',
+    SESSION_REFRESH_EACH_REQUEST=True,
+    # Add these new settings
+    PREFERRED_URL_SCHEME='https',
+    SESSION_COOKIE_DOMAIN=None,  # Allow the cookie to work across subdomains
+    MAX_CONTENT_LENGTH=16 * 1024 * 1024  # 16MB max-size
 )
-app.secret_key = secrets.token_hex(32)
+app.secret_key = 'MMMCOOKIESSSS-said-cookie-monster-hungrily' 
 
 @app.route('/check-auth', methods=['POST'])
 def check_auth():
     is_authenticated = 'authenticated' in session
-    # Refresh session if authenticated
     if is_authenticated:
+        # Force session refresh
         session.modified = True
+        session.permanent = True
     return jsonify({
         "authenticated": is_authenticated
     })
@@ -96,6 +101,7 @@ def login():
             password = request.form.get('password')
 
         if password == read_password():
+            # Set up session
             session.permanent = True
             session['authenticated'] = True
             session.modified = True
@@ -123,15 +129,16 @@ def login():
 
 @app.before_request
 def before_request():
-    # Force HTTPS
     if not request.is_secure and not request.headers.get('X-Forwarded-Proto', 'http') == 'https':
         if request.url.startswith('http://'):
             url = request.url.replace('http://', 'https://', 1)
             return redirect(url, code=301)
     
-    # Extend session lifetime on each request if user is authenticated
+    # Set session permanent at the start
+    session.permanent = True
+    
+    # Always refresh the session
     if 'authenticated' in session:
-        session.permanent = True
         session.modified = True
 
 @app.route('/logout')
