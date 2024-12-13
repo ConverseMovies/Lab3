@@ -90,11 +90,17 @@ def submit_message():
         filename = f"message_{sender}_{timestamp}.html"
         filepath = os.path.join(MESSAGE_DIR, filename)
         
+        # Generate HTML content using a consistent template
+        html_content = render_template('message_template.html', 
+                                        title=f"Message to {sender.capitalize()}", 
+                                        message=message)
+        
         # Save the message as an HTML file
         with open(filepath, 'w') as file:
-            file.write(f"<html><body><h1>Message</h1><p>{message}</p></body></html>")
+            file.write(html_content)
     
     return jsonify({"success": True})
+
 
 
 

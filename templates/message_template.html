@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="grid-bottom"></div>
+    
+    <!-- Navigation -->
+    <a href="/" class="home-link">aeris</a>
+    <nav class="nav-container">
+        <div class="nav-buttons">
+            <div class="dropdown">
+                <button class="dropdown-btn">who we are</button>
+                <div class="dropdown-content">
+                    <a href="/static/elizabeth.html">elizabeth</a>
+                    <a href="/static/gavin.html">gavin</a>
+                    <a href="/static/kaylee.html">kaylee</a>
+                    <a href="/static/luke.html">luke</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropdown-btn">our projects</button>
+                <div class="dropdown-content">
+                    <a href="#" id="aetas-link">aetas</a>
+                    <a href="#" id="lab1-link">lab one</a>
+                    <a href="#" id="lab2-link">lab two</a>
+                    <a href="#" id="lab3-link">lab three</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Message Section -->
+    <div class="profile-container">
+        <h2 class="profile-title">{{ title }}</h2>
+        <div class="content-section">
+            <p class="profile-description">{{ message }}</p>
+        </div>
+    </div>
+
+    <!-- Footer Links -->
+    <div class="bottom-text-container">
+        <a href="/" class="bottom-text">aeris</a>
+        <a href="/logs" id="logs-link" class="bottom-text">logs</a>
+    </div>
+</body>
+</html>
