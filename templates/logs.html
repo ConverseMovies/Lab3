@@ -21,14 +21,14 @@
                             {% set parts = message_file.split('_') %}
                             {% if parts|length > 2 %}
                                 {% set recipient = parts[1] %}
-                                {% set timestamp = parts[2].split('.')[0] %}
+                                {% set datestamp = parts[2].split('.')[0] %}
+                                {% set timestamp = parts[3].split('.')[0] %}
                                 {% if recipient == 'gavin' %}Gavin
                                 {% elif recipient == 'kaylee' %}Kaylee
                                 {% elif recipient == 'elizabeth' %}Elizabeth
                                 {% elif recipient == 'luke' %}Luke
                                 {% else %}Unknown{% endif %}
-                                at {{ timestamp[4:6] }}/{{ timestamp[6:8] }}/{{ timestamp[0:4] }} 
-                                {{ timestamp[9:11] }}:{{ timestamp[11:13] }}
+                                at {{ datestamp[4:6] }}/{{ datestamp[6:8] }}/{{ datestamp[0:4] }} {{ timestamp[0:2]-6 }}:{{ timestamp[2:4] }}
                             {% else %}
                                 Unknown
                             {% endif %}
