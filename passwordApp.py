@@ -4,27 +4,14 @@ import os
 import secrets
 from datetime import timedelta
 from datetime import datetime
-import logging
+from urllib.parse import urlparse
 
-# Store message
-MESSAGE_DIR = "messages"
-os.makedirs(MESSAGE_DIR, exist_ok=True)
-
-# Set up logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-# Generate a secure random secret key for sessions
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 app.secret_key = secrets.token_hex(32)
 
-# Session configuration
-app.config.update(
-    SESSION_COOKIE_NAME='aeris_session',
-    SESSION_COOKIE_SAMESITE='Lax',
-    SESSION_COOKIE_HTTPONLY=True,
-    PERMANENT_SESSION_LIFETIME=timedelta(hours=12)
-)
+
 
 def read_password(file_path="password.txt"):
     """Reads the password from the password.txt file."""
@@ -34,19 +21,12 @@ def read_password(file_path="password.txt"):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        logger.debug(f"Session contents: {session}")
-        logger.debug(f"Checking auth for route: {request.path}")
-        
         if 'authenticated' not in session:
-            logger.debug("No authentication in session")
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({"authenticated": False}), 401
-            return redirect(url_for('login', next=request.url))
-            
-        logger.debug("User is authenticated")
+            return redirect(url_for('login', next=request.path))
         return f(*args, **kwargs)
     return decorated_function
-
 
 @app.route('/submit-message', methods=['POST'])
 def submit_message():
@@ -87,44 +67,35 @@ def view_message(filename):
             return file.read()
     return "Message not found", 404
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/check-auth', methods=['POST'])
-def check_auth():
-    """Endpoint to check if user is authenticated"""
-    is_auth = 'authenticated' in session
-    logger.debug(f"Checking auth status: {is_auth}")
-    logger.debug(f"Current session: {session}")
-    return jsonify({"authenticated": is_auth})
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_password = request.json.get('password')
-        actual_password = read_password()
-        
-        if user_password == actual_password:
-            # Clear any existing session data first
-            session.clear()
-            # Set session data
+        password = request.json.get('password')
+        if password == read_password():
+            # Make the session permanent
             session.permanent = True
             session['authenticated'] = True
-            session.modified = True
             
-            next_page = request.args.get('next') or request.json.get('next')
-            logger.debug(f"Login successful, redirecting to: {next_page}")
-            logger.debug(f"Session after login: {session}")
+            # Get the next URL from either JSON body or query parameters
+            next_url = request.json.get('next') or request.args.get('next') or '/'
             
+            # Clean up the next_url
+            if '://' in next_url:
+                # Extract path from full URL
+                next_url = '/' + next_url.split('/', 3)[-1]
+            elif not next_url.startswith('/'):
+                next_url = '/' + next_url
+                
             return jsonify({
                 "success": True,
-                "redirect_url": next_page if next_page else "/"
+                "redirect_url": next_url
             })
-        
-        logger.debug("Login failed - incorrect password")
-        return jsonify({"success": False, "message": "Incorrect password."})
+            
+        return jsonify({"success": False, "message": "Incorrect password"})
     
     return render_template('login.html')
 
@@ -133,35 +104,30 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-# Protected routes with direct access
+# Protected routes
 @app.route('/lab1_summary')
 @login_required
 def lab1_summary():
-    logger.debug("Accessing lab1_summary")
     return render_template('lab1.html')
 
 @app.route('/lab2_summary')
 @login_required
 def lab2_summary():
-    logger.debug("Accessing lab2_summary")
     return render_template('lab2.html')
 
 @app.route('/lab3_summary')
 @login_required
 def lab3_summary():
-    logger.debug("Accessing lab3_summary")
     return render_template('lab3.html')
 
 @app.route('/aetas_summary')
 @login_required
 def aetas_summary():
-    logger.debug("Accessing aetas_summary")
     return render_template('calendar.html')
 
 @app.route('/logs_list')
 @login_required
 def logs_list():
-    logger.debug("Accessing logs_list")
     return render_template('logs.html')
 
 # Redirect routes
@@ -187,12 +153,6 @@ def aetas():
 
 
 
-@app.before_request
-def before_request():
-    """Log all requests for debugging"""
-    logger.debug(f"Request to: {request.path}")
-    logger.debug(f"Current session: {session}")
-
 # Team routes (unprotected)
 @app.route('/team/kaylee.html')
 def kaylee():
@@ -211,7 +171,4 @@ def gavin():
     return render_template('gavin.html')
 
 if __name__ == '__main__':
-    
-    debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
-
-    app.run(debug=debug, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

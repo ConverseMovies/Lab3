@@ -19,17 +19,9 @@
     <script>
     function submitPassword() {
         const password = document.getElementById('password').value;
-        // Get next URL and ensure it's just the path
-        let nextUrl = new URLSearchParams(window.location.search).get('next') || '/';
-        
-        // If it's a full URL, extract just the path
-        if (nextUrl.startsWith('http')) {
-            try {
-                nextUrl = new URL(nextUrl).pathname;
-            } catch {
-                nextUrl = '/';
-            }
-        }
+        // Get the 'next' parameter from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const nextUrl = urlParams.get('next') || '/';
 
         fetch('/login', {
             method: 'POST',
@@ -45,6 +37,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Use the redirect_url from the response
                 window.location.href = data.redirect_url;
             } else {
                 alert("Incorrect password. Please try again.");
