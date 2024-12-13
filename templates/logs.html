@@ -28,7 +28,19 @@
                                 {% elif recipient == 'elizabeth' %}Elizabeth
                                 {% elif recipient == 'luke' %}Luke
                                 {% else %}Unknown{% endif %}
-                                at {{ datestamp[4:6] }}/{{ datestamp[6:8] }}/{{ datestamp[0:4] }} {{ timestamp[0:2] }}:{{ timestamp[2:4] }}
+
+                                {% set hour = timestamp[0:2]|int - 6 %} <!-- Subtract 6 hours -->
+                                {% if hour < 0 %}
+                                    {% set hour = hour + 24 %} <!-- Adjust for previous day -->
+                                {% endif %}
+                                {% set am_pm = 'AM' if hour < 12 else 'PM' %}
+                                {% if hour == 0 %}
+                                    {% set hour = 12 %} <!-- Midnight is 12 AM -->
+                                {% elif hour > 12 %}
+                                    {% set hour = hour - 12 %} <!-- Convert to 12-hour format -->
+                                {% endif %}
+
+                                at {{ datestamp[4:6] }}/{{ datestamp[6:8] }}/{{ datestamp[0:4] }} {{ hour }}:{{ timestamp[2:4] }} {{ am_pm }}
                             {% else %}
                                 Unknown
                             {% endif %}
