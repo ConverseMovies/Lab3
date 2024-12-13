@@ -10,15 +10,21 @@ from urllib.parse import urlparse
 app = Flask(__name__)
 app.config.update(
     PERMANENT_SESSION_LIFETIME=timedelta(days=1),
-    SESSION_COOKIE_SECURE=True,  # For HTTPS
+    SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax'
+    SESSION_COOKIE_SAMESITE='Lax',
+    SESSION_TYPE='filesystem',  # Add this
+    SESSION_COOKIE_NAME='aeris_session',  # Custom session cookie name
+    SESSION_REFRESH_EACH_REQUEST=True  # Important: refreshes session on each request
 )
 app.secret_key = secrets.token_hex(32)
 
 @app.route('/check-auth', methods=['POST'])
 def check_auth():
     is_authenticated = 'authenticated' in session
+    # Refresh session if authenticated
+    if is_authenticated:
+        session.modified = True
     return jsonify({
         "authenticated": is_authenticated
     })
@@ -92,6 +98,7 @@ def login():
         if password == read_password():
             session.permanent = True
             session['authenticated'] = True
+            session.modified = True
             
             next_url = request.json.get('next') or request.args.get('next') or '/'
             
@@ -107,7 +114,7 @@ def login():
                     "redirect_url": next_url
                 })
             return redirect(next_url)
-            
+        
         if request.is_json:
             return jsonify({"success": False, "message": "Incorrect password"})
         return render_template('login.html', error="Incorrect password")
@@ -116,10 +123,16 @@ def login():
 
 @app.before_request
 def before_request():
+    # Force HTTPS
     if not request.is_secure and not request.headers.get('X-Forwarded-Proto', 'http') == 'https':
         if request.url.startswith('http://'):
             url = request.url.replace('http://', 'https://', 1)
             return redirect(url, code=301)
+    
+    # Extend session lifetime on each request if user is authenticated
+    if 'authenticated' in session:
+        session.permanent = True
+        session.modified = True
 
 @app.route('/logout')
 def logout():

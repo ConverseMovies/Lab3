@@ -1,29 +1,36 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Handle clicks on protected links
     document.querySelectorAll('[id$="-link"]').forEach(link => {
-        link.addEventListener('click', function (e) {
+        link.addEventListener('click', async function (e) {
             e.preventDefault();
             const targetUrl = getTargetUrl(this.id);
             
-            fetch('/check-auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'  // Important for session cookies
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch('/check-auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'  // Changed from 'include' to 'same-origin'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const data = await response.json();
+                
                 if (data.authenticated) {
-                    window.location.href = targetUrl;
+                    // Use location.replace to avoid breaking browser back button
+                    window.location.replace(targetUrl);
                 } else {
                     window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
                 }
-            })
-            .catch(() => {
+            } catch (error) {
+                console.error('Auth check failed:', error);
                 window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
-            });
+            }
         });
     });
 });
