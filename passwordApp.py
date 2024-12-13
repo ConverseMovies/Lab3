@@ -8,10 +8,20 @@ from urllib.parse import urlparse
 
 
 app = Flask(__name__)
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
+app.config.update(
+    PERMANENT_SESSION_LIFETIME=timedelta(days=1),
+    SESSION_COOKIE_SECURE=True,  # For HTTPS
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax'
+)
 app.secret_key = secrets.token_hex(32)
 
-
+@app.route('/check-auth', methods=['POST'])
+def check_auth():
+    is_authenticated = 'authenticated' in session
+    return jsonify({
+        "authenticated": is_authenticated
+    })
 
 def read_password(file_path="password.txt"):
     """Reads the password from the password.txt file."""
@@ -27,12 +37,6 @@ def login_required(f):
             return redirect(url_for('login', next=request.path))
         return f(*args, **kwargs)
     return decorated_function
-
-@app.route('/check-auth', methods=['POST'])
-def check_auth():
-    return jsonify({
-        "authenticated": 'authenticated' in session
-    })
 
 @app.route('/submit-message', methods=['POST'])
 def submit_message():
@@ -109,6 +113,13 @@ def login():
         return render_template('login.html', error="Incorrect password")
     
     return render_template('login.html')
+
+@app.before_request
+def before_request():
+    if not request.is_secure and not request.headers.get('X-Forwarded-Proto', 'http') == 'https':
+        if request.url.startswith('http://'):
+            url = request.url.replace('http://', 'https://', 1)
+            return redirect(url, code=301)
 
 @app.route('/logout')
 def logout():
