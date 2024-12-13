@@ -2,32 +2,10 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from functools import wraps
 import os
 import secrets
-from datetime import timedelta
 
 app = Flask(__name__)
-# Generate a secure random secret key for sessions
+# Simple secret key setup
 app.secret_key = secrets.token_hex(32)
-
-# Add this near the top of your Flask app
-is_production = os.environ.get('FLASK_ENV') == 'production'
-
-# Then modify the session cookie secure setting
-app.config['SESSION_COOKIE_SECURE'] = is_production
-
-# Production-ready session configuration
-app.config.update(
-    SESSION_COOKIE_SECURE=True,  # For HTTPS
-    SESSION_COOKIE_HTTPONLY=True,  # Prevent JavaScript access to session cookie
-    SESSION_COOKIE_SAMESITE='Lax',  # Prevent CSRF
-    SESSION_PERMANENT=False,  # Session expires when browser closes
-    PERMANENT_SESSION_LIFETIME=timedelta(days=1),  # Backup timeout
-    SESSION_COOKIE_NAME='AerisSession'  # Custom cookie name
-)
-
-# Check if running in development environment
-if app.debug or 'DEVELOPMENT' in os.environ:
-    # Override secure cookie setting for local development
-    app.config['SESSION_COOKIE_SECURE'] = False
 
 def read_password(file_path="password.txt"):
     """Reads the password from the password.txt file."""
@@ -38,9 +16,8 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'authenticated' not in session:
-            # Return JSON response for AJAX requests
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return jsonify({"success": False, "redirect_url": url_for('login')}), 401
+                return jsonify({"authenticated": False}), 401
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
@@ -61,7 +38,6 @@ def login():
         actual_password = read_password()
         
         if user_password == actual_password:
-            session.permanent = False  # Make session expire on browser close
             session['authenticated'] = True
             next_page = request.args.get('next') or request.json.get('next')
             return jsonify({
@@ -78,66 +54,57 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-# Protected routes
-@app.route('/lab1', methods=['GET', 'POST'])
-@login_required
-def lab1():
-    if request.method == 'POST':
-        return jsonify({"success": True, "redirect_url": url_for('lab1_summary')})
-    return redirect(url_for('lab1_summary'))
-
+# Protected routes simplified
 @app.route('/lab1_summary')
 @login_required
 def lab1_summary():
     return render_template('lab1.html')
-
-@app.route('/lab2', methods=['GET', 'POST'])
-@login_required
-def lab2():
-    if request.method == 'POST':
-        return jsonify({"success": True, "redirect_url": url_for('lab2_summary')})
-    return redirect(url_for('lab2_summary'))
 
 @app.route('/lab2_summary')
 @login_required
 def lab2_summary():
     return render_template('lab2.html')
 
-@app.route('/lab3', methods=['GET', 'POST'])
-@login_required
-def lab3():
-    if request.method == 'POST':
-        return jsonify({"success": True, "redirect_url": url_for('lab3_summary')})
-    return redirect(url_for('lab3_summary'))
-
 @app.route('/lab3_summary')
 @login_required
 def lab3_summary():
     return render_template('lab3.html')
-
-@app.route('/aetas', methods=['GET', 'POST'])
-@login_required
-def aetas():
-    if request.method == 'POST':
-        return jsonify({"success": True, "redirect_url": url_for('aetas_summary')})
-    return redirect(url_for('aetas_summary'))
 
 @app.route('/aetas_summary')
 @login_required
 def aetas_summary():
     return render_template('calendar.html')
 
-@app.route('/logs', methods=['GET', 'POST'])
-@login_required
-def logs():
-    if request.method == 'POST':
-        return jsonify({"success": True, "redirect_url": url_for('logs_list')})
-    return redirect(url_for('logs_list'))
-
 @app.route('/logs_list')
 @login_required
 def logs_list():
     return render_template('logs.html')
+
+# Simplified route handlers
+@app.route('/lab1')
+@login_required
+def lab1():
+    return redirect(url_for('lab1_summary'))
+
+@app.route('/lab2')
+@login_required
+def lab2():
+    return redirect(url_for('lab2_summary'))
+
+@app.route('/lab3')
+@login_required
+def lab3():
+    return redirect(url_for('lab3_summary'))
+
+@app.route('/aetas')
+@login_required
+def aetas():
+    return redirect(url_for('aetas_summary'))
+
+@app.route('/logs')
+@login_required
+def logs():
+    return redirect(url_for('logs_list'))
 
 # Team routes (unprotected)
 @app.route('/team/kaylee.html')
