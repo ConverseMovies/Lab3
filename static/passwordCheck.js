@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Only get tab_id from URL, no localStorage
     const urlParams = new URLSearchParams(window.location.search);
     const tabId = urlParams.get('tab_id');
     
@@ -9,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             
             let targetUrl = getTargetUrl(this.id);
-            // Only add tab_id if it exists in current URL
             if (tabId) {
                 targetUrl = addTabIdToUrl(targetUrl, tabId);
             }
@@ -42,12 +40,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Handle all regular internal links
+    // Handle all non-protected internal links
     document.querySelectorAll('a').forEach(link => {
+        // Skip if it's already a protected link
+        if (link.id && link.id.endsWith('-link')) {
+            return;
+        }
+
         const href = link.getAttribute('href');
-        // Skip if it's a protected link, external link, static file, or special link
-        if (!link.id.endsWith('-link') && 
-            href && 
+        // Check if this is an internal link we should handle
+        if (href && 
             !href.startsWith('http') && 
             !href.startsWith('/static/') && 
             href !== '#' && 
@@ -55,10 +57,11 @@ document.addEventListener('DOMContentLoaded', function () {
             
             link.addEventListener('click', function(e) {
                 e.preventDefault();
+                console.log("Non-protected link clicked:", href); // Debug log
                 let targetUrl = href;
-                // Only add tab_id if it exists in current URL
                 if (tabId) {
                     targetUrl = addTabIdToUrl(targetUrl, tabId);
+                    console.log("Added tab_id, new URL:", targetUrl); // Debug log
                 }
                 window.location.replace(window.location.origin + targetUrl);
             });
@@ -68,9 +71,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function addTabIdToUrl(url, tabId) {
     if (!tabId) return url;
-    const urlObj = new URL(url, window.location.origin);
-    urlObj.searchParams.set('tab_id', tabId);
-    return urlObj.pathname + urlObj.search;
+    // Handle both relative and absolute URLs
+    if (url.startsWith('http')) {
+        const urlObj = new URL(url);
+        urlObj.searchParams.set('tab_id', tabId);
+        return urlObj.pathname + urlObj.search;
+    } else {
+        if (url.includes('?')) {
+            return url + '&tab_id=' + tabId;
+        } else {
+            return url + '?tab_id=' + tabId;
+        }
+    }
 }
 
 function getTargetUrl(linkId) {
