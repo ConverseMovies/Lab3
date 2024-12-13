@@ -7,6 +7,10 @@ from datetime import datetime
 from urllib.parse import urlparse
 import uuid
 
+# Define directory for messages
+MESSAGE_DIR = "messages"
+os.makedirs(MESSAGE_DIR, exist_ok=True)
+
 
 app = Flask(__name__)
 app.config.update(
@@ -79,12 +83,20 @@ def send_email(to_email, subject, body):
 
 @app.route('/logs')
 def logs():
-    # Get all message files
+    # Ensure the messages directory exists
+    if not os.path.exists(MESSAGE_DIR):
+        os.makedirs(MESSAGE_DIR)
+
+    # Get all message files in the directory
     message_files = sorted(os.listdir(MESSAGE_DIR), reverse=True)
     return render_template('logs.html', message_files=message_files)
 
 @app.route('/messages/<filename>')
 def view_message(filename):
+    # Prevent directory traversal
+    if ".." in filename or "/" in filename or "\\" in filename:
+        return "Invalid filename", 400
+
     filepath = os.path.join(MESSAGE_DIR, filename)
     if os.path.exists(filepath):
         with open(filepath, 'r') as file:
