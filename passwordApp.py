@@ -21,7 +21,6 @@ app.config.update(
     # Add these settings for tab-specific sessions
     PERMANENT_SESSION=False,           # Don't make sessions permanent
     SESSION_PERMANENT=False,           # Reinforcing the non-permanent setting
-    SESSION_COOKIE_SECURE=True,        # Ensure HTTPS only
     SESSION_COOKIE_PATH='/'            # Set cookie path
 )
 app.secret_key = 'MMMCOOKIESSSS-said-cookie-monster-hungrily' 
