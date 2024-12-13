@@ -403,6 +403,9 @@ textarea[disabled] {
     margin-bottom: 10px;
     display: flex;
     gap: 10px;
+
+    margin-top: 40px; /* Add space above the homepage link */
+    padding-top: 20px; /* Add padding inside the container */
 }
 
 .bottom-text {
