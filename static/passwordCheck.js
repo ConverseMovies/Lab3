@@ -45,11 +45,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle all other internal links (non-protected)
     document.querySelectorAll('a:not([id$="-link"])').forEach(link => {
         const href = link.getAttribute('href');
-        if (href && !href.startsWith('http') && !href.startsWith('/static/') && href !== '#' && href !== '/logout') {
+        // Check if it's an internal link that's not a static resource or special link
+        if (href && 
+            !href.startsWith('http') && 
+            !href.startsWith('/static/') && 
+            href !== '#' && 
+            href !== '/logout') {
+            
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 let targetUrl = href;
-                if (tabId) {
+                
+                // Only add tab_id if we're coming from an authenticated session
+                if (tabId && document.cookie.includes('aeris_session')) {
                     targetUrl = addTabIdToUrl(targetUrl, tabId);
                 }
                 console.log("Non-protected link clicked, redirecting to:", targetUrl);
