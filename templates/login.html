@@ -20,8 +20,16 @@
     function submitPassword() {
         const password = document.getElementById('password').value;
         // Get next URL and ensure it's just the path
-        const nextParam = new URLSearchParams(window.location.search).get('next');
-        const nextUrl = nextParam ? new URL(nextParam, window.location.origin).pathname : '/';
+        let nextUrl = new URLSearchParams(window.location.search).get('next') || '/';
+        
+        // If it's a full URL, extract just the path
+        if (nextUrl.startsWith('http')) {
+            try {
+                nextUrl = new URL(nextUrl).pathname;
+            } catch {
+                nextUrl = '/';
+            }
+        }
 
         fetch('/login', {
             method: 'POST',
