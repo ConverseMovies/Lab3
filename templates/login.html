@@ -11,11 +11,52 @@
         <h1>Protected Content</h1>
         <p>Please enter the password to access this content.</p>
         <div class="password-form">
-            <form method="post">
-                <input type="password" name="password" placeholder="Enter password">
-                <button type="submit">Submit</button>
-            </form>
+            <input type="password" id="password" placeholder="Enter password">
+            <button onclick="submitPassword()">Submit</button>
         </div>
     </div>
+
+    <script>
+    // Generate tab ID if not exists
+    if (!sessionStorage.getItem('tabId')) {
+        sessionStorage.setItem('tabId', Date.now().toString(36) + Math.random().toString(36).substr(2));
+    }
+
+    function submitPassword() {
+        const password = document.getElementById('password').value;
+        const tabId = sessionStorage.getItem('tabId');
+        const nextUrl = new URLSearchParams(window.location.search).get('next') || '/';
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ 
+                password: password,
+                tabId: tabId,
+                next: nextUrl
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                sessionStorage.setItem('authenticated', 'true');
+                window.location.href = data.redirect_url;
+            } else {
+                alert("Incorrect password. Please try again.");
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Allow Enter key to submit
+    document.getElementById('password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            submitPassword();
+        }
+    });
+    </script>
 </body>
 </html>
