@@ -14,7 +14,7 @@ os.makedirs(MESSAGE_DIR, exist_ok=True)
 
 app = Flask(__name__)
 app.config.update(
-    PERMANENT_SESSION_LIFETIME=timedelta(days=1),
+    PERMANENT_SESSION_LIFETIME=timedelta(minutes=10),
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Strict',  # Changed from 'Lax' to 'Strict'
