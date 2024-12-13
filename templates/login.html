@@ -19,7 +19,9 @@
     <script>
     function submitPassword() {
         const password = document.getElementById('password').value;
-        const nextUrl = new URLSearchParams(window.location.search).get('next') || '/';
+        // Get next URL and ensure it's just the path
+        const nextParam = new URLSearchParams(window.location.search).get('next');
+        const nextUrl = nextParam ? new URL(nextParam, window.location.origin).pathname : '/';
 
         fetch('/login', {
             method: 'POST',

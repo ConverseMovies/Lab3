@@ -18,12 +18,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.authenticated) {
                     handleProtectedLink(this.id);
                 } else {
-                    window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
+                    // Ensure we only use the path portion of the URL
+                    const path = new URL(targetUrl, window.location.origin).pathname;
+                    window.location.href = `/login?next=${encodeURIComponent(path)}`;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
+                const path = new URL(targetUrl, window.location.origin).pathname;
+                window.location.href = `/login?next=${encodeURIComponent(path)}`;
             });
         });
     });
