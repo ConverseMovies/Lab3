@@ -12,14 +12,13 @@ app.config.update(
     PERMANENT_SESSION_LIFETIME=timedelta(days=1),
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax',
-    # Remove filesystem session type since Heroku's filesystem is ephemeral
+    SESSION_COOKIE_SAMESITE='Strict',  # Changed from 'Lax' to 'Strict'
     SESSION_COOKIE_NAME='aeris_session',
     SESSION_REFRESH_EACH_REQUEST=True,
-    # Add these new settings
     PREFERRED_URL_SCHEME='https',
-    SESSION_COOKIE_DOMAIN=None,  # Allow the cookie to work across subdomains
-    MAX_CONTENT_LENGTH=16 * 1024 * 1024,  # 16MB max-size
+    SESSION_COOKIE_DOMAIN=None,
+    MAX_CONTENT_LENGTH=16 * 1024 * 1024,
+    # Add these settings for tab-specific sessions
     PERMANENT_SESSION=False,           # Don't make sessions permanent
     SESSION_PERMANENT=False,           # Reinforcing the non-permanent setting
     SESSION_COOKIE_SECURE=True,        # Ensure HTTPS only
