@@ -1,18 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Get tab ID either from URL or from hidden input
     const urlParams = new URLSearchParams(window.location.search);
-    const tabId = urlParams.get('tab_id');
+    let tabId = urlParams.get('tab_id');
+    
+    // Check for hidden input if no tab ID in URL
+    if (!tabId) {
+        const hiddenInput = document.getElementById('current-tab-id');
+        if (hiddenInput) {
+            tabId = hiddenInput.value;
+        }
+    }
     
     // Handle protected links
     document.querySelectorAll('[id$="-link"]').forEach(link => {
         link.addEventListener('click', async function (e) {
-            console.log("Protected link clicked:", this.id);
             e.preventDefault();
             
             let targetUrl = getTargetUrl(this.id);
             if (tabId) {
                 targetUrl = addTabIdToUrl(targetUrl, tabId);
             }
-            console.log("Target URL with tab:", targetUrl);
             
             try {
                 const response = await fetch('/check-auth', {
@@ -42,11 +49,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Handle all other internal links (non-protected)
-    document.querySelectorAll('a:not([id$="-link"])').forEach(link => {
+    // Handle all internal links
+    document.querySelectorAll('a').forEach(link => {
         const href = link.getAttribute('href');
-        // Check if it's an internal link (including static files) but not special links
+        // Skip if it's a protected link, external link, or special link
         if (href && 
+            !link.id.endsWith('-link') && 
             !href.startsWith('http') && 
             href !== '#' && 
             href !== '/logout') {
@@ -55,11 +63,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.preventDefault();
                 let targetUrl = href;
                 
-                // Only add tab_id if we're coming from an authenticated session
+                // Add tab_id if we have one and there's an active session
                 if (tabId && document.cookie.includes('aeris_session')) {
                     targetUrl = addTabIdToUrl(targetUrl, tabId);
                 }
-                console.log("Non-protected link clicked, redirecting to:", targetUrl);
+                
                 window.location.replace(window.location.origin + targetUrl);
             });
         }

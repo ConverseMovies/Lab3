@@ -247,9 +247,10 @@ def logs_list():
 # def luke():
 #     return render_template('luke.html', tab_id=request.args.get('tab_id'))
 
-@app.route('/elizabeth.html')
+@app.route('/elizabeth')
 def elizabeth():
-    return render_template('elizabeth.html', tab_id=request.args.get('tab_id'))
+    tab_id = request.args.get('tab_id')
+    return render_template('elizabeth.html', tab_id=tab_id)
 
 # @app.route('/team/gavin.html')
 # def gavin():
