@@ -4,7 +4,7 @@ import os
 import secrets
 from datetime import timedelta
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode, parse_qs
 import uuid
 
 # Define directory for messages
@@ -30,6 +30,28 @@ app.config.update(
 )
 app.secret_key = 'MMMCOOKIESSSS-said-cookie-monster-hungrily' 
 
+def maintain_tab_id(url):
+    """Helper function to maintain tab_id when redirecting"""
+    if 'authenticated' in session and session.get('tab_id'):
+        # Parse the URL
+        parsed = urlparse(url)
+        # Get existing query parameters
+        query_params = parse_qs(parsed.query)
+        # Add or update tab_id
+        query_params['tab_id'] = [session['tab_id']]
+        # Rebuild query string
+        new_query = urlencode(query_params, doseq=True)
+        # Rebuild URL with new query string
+        from urllib.parse import urlunparse
+        return urlunparse((parsed.scheme, parsed.netloc, parsed.path, 
+                          parsed.params, new_query, parsed.fragment))
+    return url
+
+def redirect_with_tab_id(endpoint, **kwargs):
+    """Helper function for redirecting while maintaining tab_id"""
+    url = url_for(endpoint, **kwargs)
+    return redirect(maintain_tab_id(url))
+
 @app.route('/check-auth', methods=['POST'])
 def check_auth():
     is_authenticated = 'authenticated' in session
@@ -52,7 +74,7 @@ def login_required(f):
         if 'authenticated' not in session:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({"authenticated": False}), 401
-            return redirect(url_for('login', next=request.path))
+            return redirect(url_for('login', next=maintain_tab_id(request.path)))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -107,7 +129,7 @@ def view_message(filename):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', tab_id=request.args.get('tab_id'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -124,15 +146,11 @@ def login():
             
             next_url = request.json.get('next') or request.args.get('next') or '/'
             
-            # Clean and add tab_id to the next_url
+            # Clean and maintain existing tab_id if present in next_url
             if '://' in next_url:
                 next_url = urlparse(next_url).path + ('?' + urlparse(next_url).query if urlparse(next_url).query else '')
             
-            # Add tab_id to the URL
-            if '?' in next_url:
-                next_url = f"{next_url}&tab_id={session['tab_id']}"
-            else:
-                next_url = f"{next_url}?tab_id={session['tab_id']}"
+            next_url = maintain_tab_id(next_url)
             
             if request.is_json:
                 return jsonify({
@@ -190,51 +208,49 @@ def lab3_summary():
 def aetas_summary():
     return render_template('calendar.html')
 
-@app.route('/logs_list')
-@login_required
-def logs_list():
-    """Redirect to the /logs route."""
-    return redirect(url_for('logs'))
 
 # Redirect routes
 @app.route('/lab1')
 @login_required
 def lab1():
-    return redirect(url_for('lab1_summary'))
+    return redirect_with_tab_id('lab1_summary')
 
 @app.route('/lab2')
 @login_required
 def lab2():
-    return redirect(url_for('lab2_summary'))
+    return redirect_with_tab_id('lab2_summary')
 
 @app.route('/lab3')
 @login_required
 def lab3():
-    return redirect(url_for('lab3_summary'))
+    return redirect_with_tab_id('lab3_summary')
 
 @app.route('/aetas')
 @login_required
 def aetas():
-    return redirect(url_for('aetas_summary'))
+    return redirect_with_tab_id('aetas_summary')
 
-
+@app.route('/logs_list')
+@login_required
+def logs_list():
+    return redirect_with_tab_id('logs')
 
 # Team routes (unprotected)
 @app.route('/team/kaylee.html')
 def kaylee():
-    return render_template('kaylee.html')
+    return render_template('kaylee.html', tab_id=request.args.get('tab_id'))
 
 @app.route('/team/luke.html')
 def luke():
-    return render_template('luke.html')
+    return render_template('luke.html', tab_id=request.args.get('tab_id'))
 
 @app.route('/team/elizabeth.html')
 def elizabeth():
-    return render_template('elizabeth.html')
+    return render_template('elizabeth.html', tab_id=request.args.get('tab_id'))
 
 @app.route('/team/gavin.html')
 def gavin():
-    return render_template('gavin.html')
+    return render_template('gavin.html', tab_id=request.args.get('tab_id'))
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
