@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log("DOM Content Loaded");
     
-    // Find all protected links
     const protectedLinks = document.querySelectorAll('[id$="-link"]');
     console.log("Found protected links:", protectedLinks.length);
     
@@ -35,14 +34,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 if (data.authenticated) {
                     console.log("Authenticated, redirecting to:", targetUrl);
-                    window.location.href = targetUrl;
+                    // Force a proper redirect by ensuring we have the full URL
+                    window.location.replace(window.location.origin + targetUrl);
                 } else {
                     console.log("Not authenticated, redirecting to login");
-                    window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
+                    window.location.replace('/login?next=' + encodeURIComponent(targetUrl));
                 }
             } catch (error) {
                 console.error('Auth check failed:', error);
-                window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
+                window.location.replace('/login?next=' + encodeURIComponent(targetUrl));
             }
         });
     });
