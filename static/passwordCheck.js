@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             })
             .catch(error => {
+                alert("aaa");
                 console.error('Error:', error);
                 const path = new URL(targetUrl, window.location.origin).pathname;
                 window.location.href = `/login?next=${encodeURIComponent(path)}`;
