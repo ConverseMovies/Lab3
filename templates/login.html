@@ -17,9 +17,6 @@
     </div>
 
     <script>
-    // Clear any existing tab authentication when on login page
-    sessionStorage.removeItem('tabAuthenticated');
-
     function submitPassword() {
         const password = document.getElementById('password').value;
         const nextUrl = new URLSearchParams(window.location.search).get('next') || '/';
@@ -38,7 +35,6 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                sessionStorage.setItem('tabAuthenticated', 'true');
                 window.location.href = data.redirect_url;
             } else {
                 alert("Incorrect password. Please try again.");
