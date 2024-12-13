@@ -235,23 +235,6 @@ def aetas():
 def logs_list():
     return redirect_with_tab_id('logs')
 
-# Team routes (unprotected)
-# @app.route('/team/kaylee.html')
-# def kaylee():
-#     return render_template('kaylee.html', tab_id=request.args.get('tab_id'))
-
-# @app.route('/team/luke.html')
-# def luke():
-#     return render_template('luke.html', tab_id=request.args.get('tab_id'))
-
-@app.route('/elizabeth.html')
-def elizabeth():
-    tab_id = request.args.get('tab_id')
-    return render_template('elizabeth.html', tab_id=tab_id)
-
-# @app.route('/team/gavin.html')
-# def gavin():
-#     return render_template('gavin.html', tab_id=request.args.get('tab_id'))
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

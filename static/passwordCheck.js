@@ -56,9 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 let targetUrl = href;
                 
                 // Add tab_id if we have one and there's an active session
-                //if (tabId && document.cookie.includes('aeris_session')) {
                     targetUrl = addTabIdToUrl(targetUrl, tabId);
-                //}
                 
                 window.location.replace(window.location.origin + targetUrl);
             });
