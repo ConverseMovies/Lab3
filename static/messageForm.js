@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const messageInput = document.getElementById('message-input');
         const messageStatus = document.getElementById('message-status');
         const emailRecipient = document.getElementById('email-recipient').value;
+        const recipientName = document.getElementById('recipient-name').value; // Get the recipient's name
 
         // Check if the message input is empty
         if (!messageInput.value.trim()) {
@@ -26,7 +27,10 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: new URLSearchParams({ message: messageInput.value })
+            body: new URLSearchParams({ 
+                message: messageInput.value,
+                sender: recipientName // Include the recipient's name in the request
+            })
         })
         .then(response => {
             if (response.ok) {

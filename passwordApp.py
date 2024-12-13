@@ -97,6 +97,7 @@ def submit_message():
     return jsonify({"success": True})
 
 
+
 def send_email(to_email, subject, body):
     # Placeholder function for sending email
     # Use Flask-Mail, smtplib, or any email service here
