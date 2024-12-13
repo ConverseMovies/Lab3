@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>elizabeth</title>
+    <title>Logs</title>
     <link rel="stylesheet" href="/static/styles.css">
     <script src="/static/passwordCheck.js"></script>
 </head>
@@ -11,11 +11,16 @@
     <div class="grid-bottom"></div>
     
     <div class="profile-container">
-        <h2 class="profile-title" style="padding-bottom: 100px;">cut down trees. trees that have been cut down</h2>
-        <ul>
+        <h2 class="profile-title" style="padding-bottom: 50px;">cut down trees. trees that have been cut down</h2>
+        <ul class="logs-list">
             {% if message_files %}
                 {% for message_file in message_files %}
-                    <li><a href="{{ url_for('view_message', filename=message_file) }}">{{ message_file }}</a></li>
+                    <li>
+                        <a href="{{ url_for('view_message', filename=message_file) }}" class="log-link">
+                            Message sent to {{ message_file.split('_')[1].replace('.html', '') | title }} 
+                            at {{ message_file.split('_')[2].replace('-', ':').replace('.html', '') }}
+                        </a>
+                    </li>
                 {% endfor %}
             {% else %}
                 <li>No messages found.</li>
@@ -27,7 +32,7 @@
     </div>
 
     <nav class="nav-container">
-        <a href= "/" class="home-link">aeris</a>
+        <a href="/" class="home-link">aeris</a>
         <div class="nav-buttons">
             <div class="dropdown">
                 <button class="dropdown-btn">who we are</button>
@@ -45,7 +50,6 @@
                     <a href="#" id="lab1-link">lab one</a>
                     <a href="#" id="lab2-link">lab two</a>
                     <a href="#" id="lab3-link">lab three</a>
-                    
                 </div>
             </div>
         </div>
