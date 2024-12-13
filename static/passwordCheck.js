@@ -1,6 +1,15 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabId = urlParams.get('tab_id');
+    // Get or generate tab_id immediately
+    let urlParams = new URLSearchParams(window.location.search);
+    let tabId = urlParams.get('tab_id');
+    
+    // If no tab_id exists yet, generate one and add it to the URL
+    if (!tabId) {
+        tabId = generateTabId();
+        // Add tab_id to current URL without reloading
+        const newUrl = addTabIdToUrl(window.location.pathname + window.location.search, tabId);
+        window.history.replaceState({}, '', newUrl);
+    }
     
     // Handle protected links
     document.querySelectorAll('[id$="-link"]').forEach(link => {
@@ -8,9 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             
             let targetUrl = getTargetUrl(this.id);
-            if (tabId) {
-                targetUrl = addTabIdToUrl(targetUrl, tabId);
-            }
+            targetUrl = addTabIdToUrl(targetUrl, tabId);
             
             try {
                 const response = await fetch('/check-auth', {
@@ -42,48 +49,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle all non-protected internal links
     document.querySelectorAll('a').forEach(link => {
-        // Skip if it's already a protected link
-        if (link.id && link.id.endsWith('-link')) {
-            return;
-        }
-
         const href = link.getAttribute('href');
-        // Check if this is an internal link we should handle
-        if (href && 
-            !href.startsWith('http') && 
-            !href.startsWith('/static/') && 
-            href !== '#' && 
-            href !== '/logout') {
-            
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log("Non-protected link clicked:", href); // Debug log
-                let targetUrl = href;
-                if (tabId) {
-                    targetUrl = addTabIdToUrl(targetUrl, tabId);
-                    console.log("Added tab_id, new URL:", targetUrl); // Debug log
-                }
-                window.location.replace(window.location.origin + targetUrl);
-            });
-        }
+        // Skip if it's a protected link or special link
+        if (link.id && link.id.endsWith('-link')) return;
+        if (!href || href.startsWith('http') || href.startsWith('/static/') || href === '#' || href === '/logout') return;
+        
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetUrl = addTabIdToUrl(href, tabId);
+            window.location.replace(window.location.origin + targetUrl);
+        });
     });
 });
 
+// Generate a random tab ID
+function generateTabId() {
+    return 'tab-' + Math.random().toString(36).substr(2, 9);
+}
+
 function addTabIdToUrl(url, tabId) {
     if (!tabId) return url;
-    // Handle both relative and absolute URLs
-    if (url.startsWith('http')) {
-        const urlObj = new URL(url);
-        urlObj.searchParams.set('tab_id', tabId);
-        return urlObj.pathname + urlObj.search;
-    } else {
-        if (url.includes('?')) {
-            return url + '&tab_id=' + tabId;
-        } else {
-            return url + '?tab_id=' + tabId;
-        }
-    }
+    const urlObj = new URL(url, window.location.origin);
+    urlObj.searchParams.set('tab_id', tabId);
+    return urlObj.pathname + urlObj.search;
 }
+
 
 function getTargetUrl(linkId) {
     const urlMap = {
