@@ -1,18 +1,26 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabId = urlParams.get('tab_id');
+    // Get tab_id from URL or localStorage as backup
+    let urlParams = new URLSearchParams(window.location.search);
+    let tabId = urlParams.get('tab_id');
+    
+    // If we have a tabId in URL, store it
+    if (tabId) {
+        localStorage.setItem('currentTabId', tabId);
+    } else {
+        // If not in URL but in localStorage, use that
+        tabId = localStorage.getItem('currentTabId');
+    }
     
     // Handle protected links
     document.querySelectorAll('[id$="-link"]').forEach(link => {
         link.addEventListener('click', async function (e) {
-            console.log("Protected link clicked:", this.id);
             e.preventDefault();
             
             let targetUrl = getTargetUrl(this.id);
+            // Always add the stored tabId for protected pages
             if (tabId) {
                 targetUrl = addTabIdToUrl(targetUrl, tabId);
             }
-            console.log("Target URL with tab:", targetUrl);
             
             try {
                 const response = await fetch('/check-auth', {
@@ -42,17 +50,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Handle all other internal links (non-protected)
+    // Handle non-protected internal links
     document.querySelectorAll('a:not([id$="-link"])').forEach(link => {
         const href = link.getAttribute('href');
         if (href && !href.startsWith('http') && !href.startsWith('/static/') && href !== '#' && href !== '/logout') {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 let targetUrl = href;
+                // Keep tab_id in URL even for non-protected pages
                 if (tabId) {
                     targetUrl = addTabIdToUrl(targetUrl, tabId);
                 }
-                console.log("Non-protected link clicked, redirecting to:", targetUrl);
                 window.location.replace(window.location.origin + targetUrl);
             });
         }
@@ -61,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function addTabIdToUrl(url, tabId) {
     if (!tabId) return url;
+    // Handle both relative and absolute URLs
     const urlObj = new URL(url, window.location.origin);
     urlObj.searchParams.set('tab_id', tabId);
     return urlObj.pathname + urlObj.search;
