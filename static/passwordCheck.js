@@ -3,49 +3,68 @@ document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     const tabId = urlParams.get('tab_id');
     
-    // Handle clicks on protected links
-    document.querySelectorAll('[id$="-link"]').forEach(link => {
+    // Handle all navigation links, not just protected ones
+    document.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', async function (e) {
-            e.preventDefault();
-            let targetUrl = getTargetUrl(this.id);
+            const href = this.getAttribute('href');
             
-            // Always add the current tab_id if we have one
+            // Skip if it's a logout link or external link
+            if (href === '#' || href.startsWith('http') || href === '/logout') {
+                return;
+            }
+
+            // Skip modification for static team pages
+            if (href.startsWith('/static/')) {
+                return;
+            }
+
+            e.preventDefault();
+            let targetUrl = href;
+
+            // If this is a protected link (ends with -link)
+            if (this.id && this.id.endsWith('-link')) {
+                targetUrl = getTargetUrl(this.id);
+                
+                try {
+                    const response = await fetch('/check-auth', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        credentials: 'same-origin'
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (!data.authenticated) {
+                        window.location.href = `/login?next=${encodeURIComponent(addTabIdToUrl(targetUrl, tabId))}`;
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Auth check failed:', error);
+                    window.location.href = `/login?next=${encodeURIComponent(addTabIdToUrl(targetUrl, tabId))}`;
+                    return;
+                }
+            }
+            
+            // Add tab_id to all internal navigation if we have one
             if (tabId) {
                 targetUrl = addTabIdToUrl(targetUrl, tabId);
             }
             
-            try {
-                const response = await fetch('/check-auth', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin'
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                
-                const data = await response.json();
-                
-                if (data.authenticated) {
-                    // Keep the tab_id when navigating
-                    window.location.href = targetUrl;
-                } else {
-                    // Pass the target URL with tab_id to login
-                    window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
-                }
-            } catch (error) {
-                console.error('Auth check failed:', error);
-                window.location.href = `/login?next=${encodeURIComponent(targetUrl)}`;
-            }
+            window.location.href = targetUrl;
         });
     });
 });
 
 function addTabIdToUrl(url, tabId) {
+    if (!tabId) return url;
+    
     // Handle both relative and absolute URLs
     const urlObj = new URL(url, window.location.origin);
     urlObj.searchParams.set('tab_id', tabId);
