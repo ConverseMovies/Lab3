@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     if(targetUrl=='/logs_list'){
                         window.location.href = 'login?next=/logs_list';
                     }
+                    else if(targetUrl =='/lab1_summary'){
+                        window.location.href = 'login?next=/lab1_summary';
+                    }
                     else{
                     const path = new URL(targetUrl, window.location.origin).pathname;
                     window.location.href = `/login?next=${encodeURIComponent(path)}`;
